@@ -1,6 +1,8 @@
 package Projektmanagement;
 
-import java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import javax.swing.*;
 
 public class UserInterface {
@@ -10,36 +12,62 @@ public class UserInterface {
 			
 		JFrame frame = new JFrame("Projekt Management");
 		frame.setSize(800, 800);
-		frame.setLayout(new GridLayout(8, 8));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JPanel inputPanel = new JPanel();
-		JPanel tablePanel = new JPanel();
+		JPanel topPanel = new JPanel();
+		JPanel bottomPanel = new JPanel();		
 		
-		JLabel inputTitle = new JLabel("Formular", JLabel.CENTER);
-		inputTitle.setLocation(400, 10);		
-		JLabel firstname = new JLabel("firstname:");
-		firstname.setLocation(300, 550);
+		createTopPanel(topPanel);
+		createBottomPanel(bottomPanel);
 		
-		JTextField fnInput = new JTextField();
-		fnInput.setSize(300, 300);
-		fnInput.setLocation(100, 560);
-		
-		
-		JLabel tableTitle = new JLabel("Übersicht", JLabel.CENTER);
-		
-		
-		inputPanel.add(inputTitle);
-		inputPanel.add(firstname);
-		inputPanel.add(fnInput);
-		tablePanel.add(tableTitle);
-		
-		JSplitPane sl = new JSplitPane(SwingConstants.HORIZONTAL, inputPanel, tablePanel);
+		JSplitPane sl = new JSplitPane(SwingConstants.HORIZONTAL, topPanel, bottomPanel);
 		sl.setDividerLocation(400);
+			
 		
 		frame.add(sl);
 		
 		frame.setVisible(true);
+	}
+	
+	private void createTopPanel(JPanel panel) {
+		GridBagLayout gbl = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+	    gbl.setConstraints(panel, gbc);		
+        panel.setLayout(gbl);
+        
+        
+        JLabel l = null;
+        
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(createLabel(l, "Formular"), gbc);
+		
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(createLabel(l, "Firstname:"), gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(createLabel(l, "Lastname:"), gbc);
+	}
+	
+	private void createBottomPanel(JPanel panel) {
+		GridBagLayout gbl = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+	    gbl.setConstraints(panel, gbc);		
+        panel.setLayout(gbl);
+        JLabel l = null;
+        
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(createLabel(l, "Hi"), gbc);
+		
+	}
+	
+	private JLabel createLabel(JLabel label, String txt) {
+		label = new JLabel(txt);
+		label.setPreferredSize(new Dimension(60, 20));
+		return label;
 	}
 
 }
