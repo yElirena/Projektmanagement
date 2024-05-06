@@ -1,7 +1,6 @@
 package Projektmanagement;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,12 +10,13 @@ public class PMDatabase {
 	public static void connect() {  
         Connection conn = null;  
         try {  
-            // db parameters  
+        	
             String url = "jdbc:sqlite:C:\\Users\\Mariee\\eclipse-workspace\\Projektmanagement\\sqlite\\PMDatabase.sqlite";  
-            // create a connection to the database  
+              
             conn = DriverManager.getConnection(url);  
               
-            System.out.println("Connection to SQLite has been established.");  
+            System.out.println("Connection to SQLite has been established.");
+            
               
         } catch (SQLException e) {  
             System.out.println(e.getMessage());  
@@ -29,7 +29,7 @@ public class PMDatabase {
                 System.out.println(ex.getMessage());  
             }  
         }  
-    } 
+    }
 	
 	public static void main(String[] args) {
 		connect();
