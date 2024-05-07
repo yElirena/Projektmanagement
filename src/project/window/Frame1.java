@@ -1,4 +1,4 @@
-package Projektmanagement.window;
+package project.window;
 
 import java.awt.EventQueue;
 
