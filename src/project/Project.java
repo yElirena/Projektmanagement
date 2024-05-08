@@ -3,7 +3,7 @@ package project;
 
 
 public class Project {
-	private int projectid;
+	private int projectID;
 	private String acronym;
 	private String title;
 	private String description;
@@ -11,13 +11,13 @@ public class Project {
 	private String enddate;
 	
 	
-	public int getProjectid() 
+	public int getProjectID() 
 	{
-		return projectid;
+		return projectID;
 	}
-	public void setProjectid(int projectid) 
+	public void setProjectID(int projectId) 
 	{
-		this.projectid = projectid;
+		this.projectID = projectId;
 	}
 	
 	public String getAcronym() 
