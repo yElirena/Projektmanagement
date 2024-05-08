@@ -3,6 +3,7 @@ package project;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -51,13 +52,14 @@ public class PMDatabase
 			e.printStackTrace();
 		}		
 	}
-	public static void updateTables()
+	public static void insertIntoTables()
 	{
 		connect();
 		
 		try 
 		{
 			PreparedStatement pStmt = conn.prepareStatement("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES ('ABC', 'Alphabet', 'Description', '2024-06-12', '2024-06-15')");
+			pStmt.execute();
 			pStmt.close();
 		} 
 		catch (SQLException e) 
@@ -73,10 +75,16 @@ public class PMDatabase
 		try 
 		{
 			PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM Project");
+			ResultSet rs = pStmt.executeQuery();
+			while(rs.next()) {
+				String str = String.format("ID:  %d, Acronym: %s, Title: %s, Description: %s, Starting Date: %s, End Date: %s", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
+				System.out.println(str);
+			}
+			rs.close();
+			pStmt.close();
 		} 
 		catch (SQLException e) 
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -85,7 +93,8 @@ public class PMDatabase
 	{
 		connect();
 		createTables();
-		updateTables();
+		//insertIntoTables();
+		fetchFromTables();
 	
 	}
 
