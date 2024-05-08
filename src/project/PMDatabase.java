@@ -2,6 +2,8 @@ package project;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -50,33 +52,49 @@ public class PMDatabase
 			e.printStackTrace();
 		}		
 	}
-	public static void updateTables()
+	public static void insertIntoTables()
 	{
 		connect();
 		
 		try 
 		{
-			Statement stmt = conn.createStatement();
-			stmt.execute("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES ('ABC', 'Alphabet', '2024-06-12', '2024-06-15')");
-			stmt.close();
-			stmt.execute("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) VALUES ('Charlie', 'Brown', 'Male', 'charlie.brown@peanuts.com', '+49 176 44444', '+49 176 44444', 'c.brown', 'password1234')");
-			stmt.close();
-			stmt.execute("INSERT INTO Person_Project (personID, projectID) VALUES (1,1)");
-			stmt.close();
+			PreparedStatement pStmt = conn.prepareStatement("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES ('ABC', 'Alphabet', 'Description', '2024-06-12', '2024-06-15')");
+			pStmt.execute();
+			pStmt.close();
 		} 
 		catch (SQLException e) 
 		{
 			e.printStackTrace();
 		}
 		
+	}
+	public static void fetchFromTables() 
+	{
+		connect();
 		
+		try 
+		{
+			PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM Project");
+			ResultSet rs = pStmt.executeQuery();
+			while(rs.next()) {
+				String str = String.format("ID:  %d, Acronym: %s, Title: %s, Description: %s, Starting Date: %s, End Date: %s", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
+				System.out.println(str);
+			}
+			rs.close();
+			pStmt.close();
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) 
 	{
 		connect();
 		createTables();
-		updateTables();
+		//insertIntoTables();
+		fetchFromTables();
 	
 	}
 
