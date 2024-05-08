@@ -2,6 +2,7 @@ package project;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -56,20 +57,28 @@ public class PMDatabase
 		
 		try 
 		{
-			Statement stmt = conn.createStatement();
-			stmt.execute("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES ('ABC', 'Alphabet', '2024-06-12', '2024-06-15')");
-			stmt.close();
-			stmt.execute("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) VALUES ('Charlie', 'Brown', 'Male', 'charlie.brown@peanuts.com', '+49 176 44444', '+49 176 44444', 'c.brown', 'password1234')");
-			stmt.close();
-			stmt.execute("INSERT INTO Person_Project (personID, projectID) VALUES (1,1)");
-			stmt.close();
+			PreparedStatement pStmt = conn.prepareStatement("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES ('ABC', 'Alphabet', 'Description', '2024-06-12', '2024-06-15')");
+			pStmt.close();
 		} 
 		catch (SQLException e) 
 		{
 			e.printStackTrace();
 		}
 		
+	}
+	public static void fetchFromTables() 
+	{
+		connect();
 		
+		try 
+		{
+			PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM Project");
+		} 
+		catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) 
