@@ -1,24 +1,20 @@
 package project.window;
 
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import java.awt.Dimension;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -26,6 +22,7 @@ import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JScrollBar;
 import javax.swing.border.LineBorder;
+import javax.swing.table.*;
 import java.awt.Color;
 import javax.swing.JTable;
 import java.awt.Component;
@@ -55,7 +52,7 @@ public class PMWindow extends JFrame {
 	private JLabel lblPassword;
 	private JTextField tfPassword;
 	private JLabel lblProjectName;
-	private JButton btnAmend;
+	private JButton btnUpdate;
 	private JButton btnDelete;
 	private JLabel lblProject;
 	private JLabel lblAcronym;
@@ -71,12 +68,21 @@ public class PMWindow extends JFrame {
 	private JTextField tfFax;
 	private JTextField tfLastname;
 	private JButton btnSave;
-	private JTable tablePerson_Projects;
 	private List<JTextField> tfList = new ArrayList<JTextField>();
 	private JScrollPane scpDescription;
 	private JScrollPane scpProjects;
 	private JTextArea taProjects;
 	private JTextArea taDescription;
+	private JTable tablePerson;
+	private String[] personHeaders;
+	private String[] projectHeaders;
+	private int numPersonRows;
+	private int numProjectRows;
+	private DefaultTableModel modelPerson;
+	private DefaultTableModel modelProject;
+	private JButton btnChangeTable;
+	private boolean isFirstTable = true;
+
 
 	/**
 	 * Launch the application.
@@ -239,6 +245,7 @@ public class PMWindow extends JFrame {
 		lblDescription.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
 		btnCancel = new JButton("Cancel");
+		btnCancel.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnCancel.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
@@ -393,27 +400,35 @@ public class PMWindow extends JFrame {
 		bottomPanel.setMaximumSize(new Dimension(32767, 16383));
 		splitPane.setRightComponent(bottomPanel);
 		
-		btnAmend = new JButton("Amend");
-		btnAmend.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btnUpdate = new JButton("Update");
+		btnUpdate.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
+		btnUpdate.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
 		btnDelete = new JButton("Delete");
+		btnDelete.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnDelete.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
 		JScrollPane scpTable = new JScrollPane();
+		
+		btnChangeTable = new JButton("Change Table");
+		btnChangeTable.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
+		btnChangeTable.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		GroupLayout gl_bottomPanel = new GroupLayout(bottomPanel);
 		gl_bottomPanel.setHorizontalGroup(
 			gl_bottomPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_bottomPanel.createSequentialGroup()
-					.addGroup(gl_bottomPanel.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_bottomPanel.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_bottomPanel.createSequentialGroup()
 							.addGap(289)
-							.addComponent(btnAmend, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnUpdate, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnDelete, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE))
+							.addComponent(btnDelete, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnChangeTable))
 						.addGroup(gl_bottomPanel.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(scpTable, GroupLayout.PREFERRED_SIZE, 779, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(9))
 		);
 		gl_bottomPanel.setVerticalGroup(
 			gl_bottomPanel.createParallelGroup(Alignment.LEADING)
@@ -421,28 +436,44 @@ public class PMWindow extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_bottomPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnDelete)
-						.addComponent(btnAmend))
+						.addComponent(btnUpdate)
+						.addComponent(btnChangeTable))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(scpTable, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		
-		tablePerson_Projects = new JTable();
-		scpTable.setViewportView(tablePerson_Projects);
+		personHeaders = new String[]{"ID", "Firstname", "Lastname", "E-Mail", "Phone", "Fax", "Gender", "Username"};
+		numPersonRows = 20;
+		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length);
+		modelPerson.setColumnIdentifiers(personHeaders);
+		
+		projectHeaders = new String[] {"ID", "Acronym", "Title", "Description", "Starting Date", "End Date"};
+		numProjectRows = 20;
+		modelProject = new DefaultTableModel(numProjectRows, projectHeaders.length);
+		modelProject.setColumnIdentifiers(projectHeaders);
+		
+		tablePerson = new JTable(modelPerson);
+		tablePerson.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+		scpTable.setViewportView(tablePerson);
 		bottomPanel.setLayout(gl_bottomPanel);
 	}
 	private void btnActions() 
 	{
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		
 		btnCancel.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
 				int returnValue = 0;
-				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?", "Are you sure?", JOptionPane.YES_NO_OPTION);
+				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?", "Cancel", JOptionPane.YES_NO_OPTION);
 				 if(returnValue == JOptionPane.YES_OPTION) 
 				 {
-					 JOptionPane.showMessageDialog(null, "You clicked yes");
 					 for(JTextField tf : tfList)
 					 {
 						 tf.setText("");
@@ -460,7 +491,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
-		btnAmend.addActionListener(new ActionListener() 
+		btnUpdate.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
@@ -483,6 +514,23 @@ public class PMWindow extends JFrame {
 				 {
 					 JOptionPane.showMessageDialog(null, "You clicked no.");					 
 				 }
+			}
+		});
+		btnChangeTable.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				if(isFirstTable) 
+				{
+					tablePerson.setModel(modelProject);
+					isFirstTable = false;
+					
+				}
+				else 
+				{
+					tablePerson.setModel(modelPerson);
+					isFirstTable = true;
+				}
 			}
 		});
 						
