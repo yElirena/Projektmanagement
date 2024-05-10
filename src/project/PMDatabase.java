@@ -7,12 +7,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.table.DefaultTableModel;
+
 public class PMDatabase 
 {
 	
 	private static Connection conn;
 	
-	public static void connect() 
+	public static Connection connect() 
 	{  
         try 
         {  
@@ -22,13 +24,13 @@ public class PMDatabase
             conn = DriverManager.getConnection(url);  
               
             System.out.println("Connection to SQLite has been established.");
-            
               
         } 
         catch (SQLException e) 
         {  
             System.out.println(e.getMessage());  
 		}  
+        return conn;
     }
 	public static void createTables() 
 	{
@@ -53,34 +55,27 @@ public class PMDatabase
 			e.printStackTrace();
 		}		
 	}
-	public static void insertIntoTables()
+	public static void fetchFromPerson(DefaultTableModel modelPerson) 
 	{
 		connect();
 		
 		try 
 		{
-			PreparedStatement pStmt = conn.prepareStatement("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES ('ABC', 'Alphabet', 'Description', '2024-06-12', '2024-06-15')");
-			pStmt.execute();
-			pStmt.close();
-			conn.close();
-		} 
-		catch (SQLException e) 
-		{
-			e.printStackTrace();
-		}
-		
-	}
-	public static void fetchFromTables() 
-	{
-		connect();
-		
-		try 
-		{
-			PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM Project");
+			modelPerson.setRowCount(0);
+			PreparedStatement pStmt = conn.prepareStatement("SELECT personID, firstname, lastname, sex, email, phone, fax, username FROM Person");
 			ResultSet rs = pStmt.executeQuery();
 			while(rs.next()) {
-				String str = String.format("ID:  %d, Acronym: %s, Title: %s, Description: %s, Starting Date: %s, End Date: %s", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
-				System.out.println(str);
+				Object[] row = {
+						rs.getInt("personID"),
+						rs.getString("firstname"),
+						rs.getString("lastname"),
+						rs.getString("sex"),
+						rs.getString("email"),
+						rs.getString("phone"),
+						rs.getString("fax"),
+						rs.getString("username")
+				};
+				modelPerson.addRow(row);
 			}
 			rs.close();
 			pStmt.close();
@@ -91,14 +86,47 @@ public class PMDatabase
 			e.printStackTrace();
 		}
 	}
-	
-	public static void main(String[] args) 
+	public static void fetchFromProjects(DefaultTableModel modelProject) 
 	{
 		connect();
-		createTables();
-		//insertIntoTables();
-		fetchFromTables();
+		
+		try 
+		{
+			modelProject.setRowCount(0);
+			PreparedStatement pStmt = conn.prepareStatement("SELECT projectID, acronym, title, description, startingDate, endDate FROM Project");
+			ResultSet rs = pStmt.executeQuery();
+			while(rs.next()) {
+				Object[] row = {
+						rs.getInt("projectID"),
+						rs.getString("acronym"),
+						rs.getString("title"),
+						rs.getString("description"),
+						rs.getString("startingDate"),
+						rs.getString("endDate")
+				};
+				modelProject.addRow(row);
+			}
+			rs.close();
+			pStmt.close();
+			conn.close();
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}		
+	}
 	
+	public static void closeConn() {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public static void main(String[] args) 
+	{
+		//connect();
+		//createTables();
 	}
 
 }

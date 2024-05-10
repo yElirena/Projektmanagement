@@ -6,6 +6,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import java.awt.Dimension;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -23,10 +26,20 @@ import javax.swing.JButton;
 import javax.swing.JScrollBar;
 import javax.swing.border.LineBorder;
 import javax.swing.table.*;
+
+import project.PMDatabase;
+
 import java.awt.Color;
 import javax.swing.JTable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import javax.swing.border.BevelBorder;
 import javax.swing.JScrollPane;
@@ -267,26 +280,26 @@ public class PMWindow extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblLastname, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblEmail, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblSex)
 						.addComponent(lblPhone, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblFax, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblSex)
 						.addComponent(lblUsername)
 						.addComponent(lblPassword)
 						.addComponent(lblProjectName)
-						.addComponent(lblFirstname, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblFirstname, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblEmail, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
 					.addGap(25)
 					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_topPanel.createSequentialGroup()
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(cbSex, 0, 254, Short.MAX_VALUE)
 								.addComponent(tfFirstname, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
 								.addComponent(tfPassword, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
 								.addComponent(tfUsername, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(cbSex, 0, 254, Short.MAX_VALUE)
 								.addComponent(tfFax, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
 								.addComponent(tfPhone, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfEmail, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfLastname, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
+								.addComponent(tfLastname, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+								.addComponent(tfEmail, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
 							.addGap(60)
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_topPanel.createSequentialGroup()
@@ -345,10 +358,10 @@ public class PMWindow extends JFrame {
 						.addComponent(lblTitle))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblEmail)
-						.addComponent(tfEmail, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblStartdate)
-						.addComponent(tfStartdate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfStartdate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cbSex, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblSex))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblPhone)
@@ -364,8 +377,8 @@ public class PMWindow extends JFrame {
 								.addComponent(lblDescription))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblSex)
-								.addComponent(cbSex, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(tfEmail, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblEmail))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblUsername)
@@ -443,15 +456,19 @@ public class PMWindow extends JFrame {
 					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		
-		personHeaders = new String[]{"ID", "Firstname", "Lastname", "E-Mail", "Phone", "Fax", "Gender", "Username"};
-		numPersonRows = 20;
+		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username"};
+		numPersonRows = 0;
 		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length);
 		modelPerson.setColumnIdentifiers(personHeaders);
 		
-		projectHeaders = new String[] {"ID", "Acronym", "Title", "Description", "Starting Date", "End Date"};
-		numProjectRows = 20;
+		
+		projectHeaders = new String[] {"ID", "Acronym", "Title", "Description", "Starting Date", "End Date", "Collaborators"};
+		numProjectRows = 0;
 		modelProject = new DefaultTableModel(numProjectRows, projectHeaders.length);
 		modelProject.setColumnIdentifiers(projectHeaders);
+		
+		PMDatabase.fetchFromPerson(modelPerson);
+		PMDatabase.fetchFromProjects(modelProject);
 		
 		tablePerson = new JTable(modelPerson);
 		tablePerson.setFont(new Font("Times New Roman", Font.PLAIN, 12));
@@ -460,9 +477,70 @@ public class PMWindow extends JFrame {
 	}
 	private void btnActions() 
 	{
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnSave.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{					
+				try {
+					Connection conn = PMDatabase.connect();  
+					
+					PreparedStatement pstmt;
 				
+					if(!tfFirstname.getText().isEmpty()) 
+					{
+						String firstname = tfFirstname.getText();
+						String lastname = tfLastname.getText();
+						String gender = (String) cbSex.getSelectedItem();
+						String email = tfEmail.getText();
+						String phone = tfPhone.getText();
+						String fax = tfFax.getText();
+						String username = tfUsername.getText();
+						String password = tfPassword.getText();
+						
+							
+						pstmt = conn.prepareStatement("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) "
+										+ "VALUES (?,?,?,?,?,?,?,?)");
+						pstmt.setString(1, firstname);
+						pstmt.setString(2, lastname);
+						pstmt.setString(3, gender);
+						pstmt.setString(4, email);
+						pstmt.setString(5,  phone);
+						pstmt.setString(6, fax);
+						pstmt.setString(7, username);
+						pstmt.setString(8, password);
+						pstmt.execute();
+						pstmt.close();
+						
+						PMDatabase.fetchFromPerson(modelPerson);
+					} 
+					if(!tfAcronym.getText().isEmpty()) 
+					{
+						String acronym = tfAcronym.getText();
+						String title = tfTitle.getText();
+						String description = taDescription.getText();
+						String startdate = tfStartdate.getText();
+						String endDate = tfEnddate.getText();
+						
+						pstmt = conn.prepareStatement("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES (?,?,?,?,?)");
+						pstmt.setString(1, acronym);
+						pstmt.setString(2, title);
+						pstmt.setString(3, description);
+						pstmt.setString(4, startdate);
+						pstmt.setString(5,  endDate);
+						pstmt.execute();
+						pstmt.close();
+						
+						PMDatabase.fetchFromProjects(modelProject);
+
+					}
+					tablePerson.repaint();
+					conn.close();
+					resetFields();
+					} 
+				catch (SQLException e1) 
+				{
+					e1.printStackTrace();
+				}
 			}
 		});
 		
@@ -471,23 +549,12 @@ public class PMWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) 
 			{
 				int returnValue = 0;
-				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?", "Cancel", JOptionPane.YES_NO_OPTION);
+				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to reset the fields?", "Cancel", JOptionPane.YES_NO_OPTION);
 				 if(returnValue == JOptionPane.YES_OPTION) 
 				 {
-					 for(JTextField tf : tfList)
-					 {
-						 tf.setText("");
-					 }
-					 cbSex.setSelectedIndex(0);
-					 taProjects.setText("");
-					 taDescription.setText("");
+					 resetFields();	 
 					 
-					 
-				 }
-				 else if(returnValue == JOptionPane.NO_OPTION) 
-				 {
-					 JOptionPane.showMessageDialog(null, "You clicked no.");					 
-				 }				
+				 }			
 			}
 		});
 		
@@ -504,18 +571,24 @@ public class PMWindow extends JFrame {
 			public void actionPerformed(ActionEvent e)
 			{
 				int returnValue = 0;
-				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this?", "Are you sure?", JOptionPane.YES_NO_OPTION);
+				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this entry?", "Are you sure?", JOptionPane.YES_NO_OPTION);
 				 if(returnValue == JOptionPane.YES_OPTION) 
 				 {
-					 JOptionPane.showMessageDialog(null, "You clicked yes");
+					 Connection conn = PMDatabase.connect();
+					 try 
+					 {
+						PreparedStatement pstmt = conn.prepareStatement("");
+					 } 
+					 catch (SQLException e1) 
+					 {
+						e1.printStackTrace();
+					 }
+					 PMDatabase.closeConn();
 					 
-				 }
-				 else if(returnValue == JOptionPane.NO_OPTION) 
-				 {
-					 JOptionPane.showMessageDialog(null, "You clicked no.");					 
 				 }
 			}
 		});
+		
 		btnChangeTable.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -529,11 +602,20 @@ public class PMWindow extends JFrame {
 				else 
 				{
 					tablePerson.setModel(modelPerson);
-					isFirstTable = true;
+					isFirstTable = true;	
 				}
 			}
-		});
-						
+		});						
+	}
+	public void resetFields() 
+	{
+		for(JTextField tf : tfList)
+		 {
+			 tf.setText("");
+		 }
+		 cbSex.setSelectedIndex(0);
+		 taProjects.setText("");
+		 taDescription.setText("");
 	}
 }
 
