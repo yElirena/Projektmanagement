@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
@@ -71,6 +72,11 @@ public class PMWindow extends JFrame {
 	private JTextField tfLastname;
 	private JButton btnSave;
 	private JTable tablePerson_Projects;
+	private List<JTextField> tfList = new ArrayList<JTextField>();
+	private JScrollPane scpDescription;
+	private JScrollPane scpProjects;
+	private JTextArea taProjects;
+	private JTextArea taDescription;
 
 	/**
 	 * Launch the application.
@@ -217,6 +223,18 @@ public class PMWindow extends JFrame {
 		tfEnddate.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		tfEnddate.setColumns(10);
 		
+		tfList.add(tfFirstname);
+		tfList.add(tfLastname);
+		tfList.add(tfEmail);
+		tfList.add(tfPhone);
+		tfList.add(tfFax);
+		tfList.add(tfUsername);
+		tfList.add(tfPassword);
+		tfList.add(tfAcronym);
+		tfList.add(tfTitle);
+		tfList.add(tfStartdate);
+		tfList.add(tfEnddate);
+		
 		JLabel lblDescription = new JLabel("Description:");
 		lblDescription.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
@@ -228,9 +246,9 @@ public class PMWindow extends JFrame {
 		btnSave.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnSave.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
-		JScrollPane scpProjects = new JScrollPane();
+		scpProjects = new JScrollPane();
 		
-		JScrollPane scpDescription = new JScrollPane();
+		scpDescription = new JScrollPane();
 		GroupLayout gl_topPanel = new GroupLayout(topPanel);
 		gl_topPanel.setHorizontalGroup(
 			gl_topPanel.createParallelGroup(Alignment.TRAILING)
@@ -361,11 +379,11 @@ public class PMWindow extends JFrame {
 					.addGap(14))
 		);
 		
-		JTextArea taDescription = new JTextArea();
+		taDescription = new JTextArea();
 		taDescription.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		scpDescription.setViewportView(taDescription);
 		
-		JTextArea taProjects = new JTextArea();
+		taProjects = new JTextArea();
 		taProjects.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		scpProjects.setViewportView(taProjects);
 		topPanel.setLayout(gl_topPanel);
@@ -420,7 +438,25 @@ public class PMWindow extends JFrame {
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				
+				int returnValue = 0;
+				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?", "Are you sure?", JOptionPane.YES_NO_OPTION);
+				 if(returnValue == JOptionPane.YES_OPTION) 
+				 {
+					 JOptionPane.showMessageDialog(null, "You clicked yes");
+					 for(JTextField tf : tfList)
+					 {
+						 tf.setText("");
+					 }
+					 cbSex.setSelectedIndex(0);
+					 taProjects.setText("");
+					 taDescription.setText("");
+					 
+					 
+				 }
+				 else if(returnValue == JOptionPane.NO_OPTION) 
+				 {
+					 JOptionPane.showMessageDialog(null, "You clicked no.");					 
+				 }				
 			}
 		});
 		
@@ -436,7 +472,17 @@ public class PMWindow extends JFrame {
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this?");
+				int returnValue = 0;
+				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this?", "Are you sure?", JOptionPane.YES_NO_OPTION);
+				 if(returnValue == JOptionPane.YES_OPTION) 
+				 {
+					 JOptionPane.showMessageDialog(null, "You clicked yes");
+					 
+				 }
+				 else if(returnValue == JOptionPane.NO_OPTION) 
+				 {
+					 JOptionPane.showMessageDialog(null, "You clicked no.");					 
+				 }
 			}
 		});
 						
