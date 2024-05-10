@@ -436,7 +436,16 @@ public class PMWindow extends JFrame {
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this?");
+				int returnValue = 0;
+				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this?", "Are you sure?", JOptionPane.YES_NO_OPTION);
+				 if(returnValue == JOptionPane.YES_OPTION) 
+				 {
+					 JOptionPane.showMessageDialog(null, "You clicked yes");
+				 }
+				 else if(returnValue == JOptionPane.NO_OPTION) 
+				 {
+					 JOptionPane.showMessageDialog(null, "You clicked no.");					 
+				 }
 			}
 		});
 						
