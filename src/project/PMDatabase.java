@@ -46,6 +46,7 @@ public class PMDatabase
 			stmt.execute("CREATE TABLE IF NOT EXISTS Person_Project (personID INTEGER, projectID INTEGER, FOREIGN KEY(personID) REFERENCES Person(personID) ON UPDATE CASCADE, FOREIGN KEY(projectID) REFERENCES Project(projectID) ON UPDATE CASCADE)");
 			stmt.close();
 			System.out.println("Tables have been created successfully.");
+			conn.close();
 		} 
 		catch (SQLException e) 
 		{
@@ -61,6 +62,7 @@ public class PMDatabase
 			PreparedStatement pStmt = conn.prepareStatement("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES ('ABC', 'Alphabet', 'Description', '2024-06-12', '2024-06-15')");
 			pStmt.execute();
 			pStmt.close();
+			conn.close();
 		} 
 		catch (SQLException e) 
 		{
@@ -82,6 +84,7 @@ public class PMDatabase
 			}
 			rs.close();
 			pStmt.close();
+			conn.close();
 		} 
 		catch (SQLException e) 
 		{
