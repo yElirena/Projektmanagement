@@ -111,6 +111,8 @@ public class PMWindow extends JFrame {
 	private String startdate;
 	private String enddate;
 	private String description;
+	private int projectID;
+	private int personID;
 
 
 	/**
@@ -516,6 +518,7 @@ public class PMWindow extends JFrame {
 				{
 					if(row >= 0 && col >= 0) 
 					{
+						personID = (int) tablePerson.getValueAt(row, 0);
 						firstname = tablePerson.getValueAt(row, 1).toString();
 						lastname = tablePerson.getValueAt(row, 2).toString();
 						sex = tablePerson.getValueAt(row, 3);
@@ -537,6 +540,7 @@ public class PMWindow extends JFrame {
 				{
 					if(row >= 0 && col >= 0) 
 					{
+						projectID = (int) tablePerson.getValueAt(row, 0);
 						acronym = tablePerson.getValueAt(row, 1).toString();
 						title = tablePerson.getValueAt(row, 2).toString();
 						startdate = tablePerson.getValueAt(row, 3).toString();
@@ -656,8 +660,24 @@ public class PMWindow extends JFrame {
 					 Connection conn = PMDatabase.connect();
 					 try 
 					 {
-						 //TODO write mouse listener for selected table row and have them deleted
-						PreparedStatement pstmt = conn.prepareStatement("");
+						if(isFirstTable) {
+							PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Person WHERE personID = ?");
+							pstmt.setInt(1, personID);
+							pstmt.executeUpdate();
+							pstmt.close();
+							PMDatabase.fetchFromPerson(modelPerson);
+						}
+						else if(!isFirstTable) 
+						{
+							PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Project WHERE projectID = ?");
+							pstmt.setInt(1, projectID);
+							pstmt.executeUpdate();
+							pstmt.close();
+							PMDatabase.fetchFromPerson(modelProject);
+						}
+						tablePerson.repaint();
+						conn.close();
+						resetFields();
 					 } 
 					 catch (SQLException e1) 
 					 {
@@ -677,12 +697,14 @@ public class PMWindow extends JFrame {
 				{
 					tablePerson.setModel(modelProject);
 					isFirstTable = false;
+					resetFields();
 					
 				}
 				else 
 				{
 					tablePerson.setModel(modelPerson);
-					isFirstTable = true;	
+					isFirstTable = true;
+					resetFields();
 				}
 			}
 		});						
