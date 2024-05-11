@@ -95,15 +95,39 @@ public class PMDatabase
 			modelProject.setRowCount(0);
 			PreparedStatement pStmt = conn.prepareStatement("SELECT projectID, acronym, title, startdate, enddate, description FROM Project");
 			ResultSet rs = pStmt.executeQuery();
-			while(rs.next()) {
-				Object[] row = {
-						rs.getInt("projectID"),
-						rs.getString("acronym"),
-						rs.getString("title"),
-						rs.getString("startdate"),
-						rs.getString("endDate"),
-						rs.getString("description")
+			while(rs.next()) 
+			{
+				
+				int projectID = rs.getInt("projectID");
+				String acronym = rs.getString("acronym");
+				String title = rs.getString("title");
+				String startdate = rs.getString("startdate");
+				String enddate = rs.getString("enddate");
+				String description =rs.getString("description");
+				
+				PreparedStatement pStmt2 = conn.prepareStatement("SELECT p.lastname FROM PERSON p JOIN Person_Project pp ON p.personID = pp.personID WHERE pp.projectID = ?");
+				pStmt2.setInt(1, projectID);
+				ResultSet rsCollab = pStmt2.executeQuery();
+				StringBuilder collaborators = new StringBuilder();
+				while(rsCollab.next()) 
+				{
+					collaborators.append(rsCollab.getString("lastname")).append(", ");
+				}
+				if(collaborators.length() > 0) 
+				{
+					collaborators.setLength(collaborators.length() - 2);
+				}
+				Object[] row = 
+				{
+					projectID,
+					acronym,
+					title,
+					startdate,
+					enddate,
+					description,
+					collaborators.toString()
 				};
+				
 				modelProject.addRow(row);
 			}
 			rs.close();
@@ -116,10 +140,13 @@ public class PMDatabase
 		}		
 	}
 	
-	public static void closeConn() {
-		try {
+	public static void closeConn() 
+	{
+		try 
+		{
 			conn.close();
-		} catch (SQLException e) {
+		} catch (SQLException e) 
+		{
 			e.printStackTrace();
 		}
 	}

@@ -569,7 +569,7 @@ public class PMWindow extends JFrame {
 					
 					PreparedStatement pstmt;
 				
-					if(!tfFirstname.getText().isEmpty()) 
+					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
 					{
 						String firstname = tfFirstname.getText();
 						String lastname = tfLastname.getText();
@@ -596,7 +596,7 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromPerson(modelPerson);
 					} 
-					if(!tfAcronym.getText().isEmpty()) 
+					if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty()) 
 					{
 						String acronym = tfAcronym.getText();
 						String title = tfTitle.getText();
