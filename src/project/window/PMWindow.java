@@ -33,6 +33,9 @@ import java.awt.Color;
 import javax.swing.JTable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -458,13 +461,27 @@ public class PMWindow extends JFrame {
 		
 		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username"};
 		numPersonRows = 0;
-		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length);
+		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length) 
+		{
+			@Override
+			public boolean isCellEditable(int row, int column) 
+			{
+				return false;
+			}
+		};
 		modelPerson.setColumnIdentifiers(personHeaders);
 		
 		
 		projectHeaders = new String[] {"ID", "Acronym", "Title", "Description", "Starting Date", "End Date", "Collaborators"};
 		numProjectRows = 0;
-		modelProject = new DefaultTableModel(numProjectRows, projectHeaders.length);
+		modelProject = new DefaultTableModel(numProjectRows, projectHeaders.length) 
+		{
+			@Override
+			public boolean isCellEditable(int row, int column) 
+			{
+			    return false;
+			}
+		};
 		modelProject.setColumnIdentifiers(projectHeaders);
 		
 		PMDatabase.fetchFromPerson(modelPerson);
@@ -474,7 +491,56 @@ public class PMWindow extends JFrame {
 		tablePerson.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		scpTable.setViewportView(tablePerson);
 		bottomPanel.setLayout(gl_bottomPanel);
+		
+		tablePerson.addMouseListener(new MouseAdapter() 
+		{
+			@Override
+			public void mouseClicked(MouseEvent e) 
+			{
+				int row = tablePerson.rowAtPoint(e.getPoint());
+				int col = tablePerson.columnAtPoint(e.getPoint());
+				if(isFirstTable) 
+				{
+					if(row >= 0 && col >= 0) 
+					{
+						String firstname = tablePerson.getValueAt(row, 1).toString();
+						String lastname = tablePerson.getValueAt(row, 2).toString();
+						Object gender = tablePerson.getValueAt(row, 3);
+						String email = tablePerson.getValueAt(row, 4).toString();
+						String phone = tablePerson.getValueAt(row, 5).toString();
+						String fax = tablePerson.getValueAt(row, 6).toString();
+						String username = tablePerson.getValueAt(row, 7).toString();						
+						
+						tfFirstname.setText(firstname);
+						tfLastname.setText(lastname);
+						cbSex.setSelectedItem(gender);
+						tfEmail.setText(email);
+						tfPhone.setText(phone);
+						tfFax.setText(fax);
+						tfUsername.setText(username);
+					}
+				}
+				else if(!isFirstTable) 
+				{
+					if(row >= 0 && col >= 0) 
+					{
+						String acronym = tablePerson.getValueAt(row, 1).toString();
+						String title = tablePerson.getValueAt(row, 2).toString();
+						String startdate = tablePerson.getValueAt(row, 3).toString();
+						String enddate = tablePerson.getValueAt(row, 4).toString();
+						String description = tablePerson.getValueAt(row, 5).toString();
+						
+						tfAcronym.setText(acronym);
+						tfTitle.setText(title);
+						tfStartdate.setText(startdate);
+						tfEnddate.setText(enddate);
+						taDescription.setText(description);
+					}
+				}
+			}
+		});
 	}
+	
 	private void btnActions() 
 	{
 		btnSave.addActionListener(new ActionListener() 
@@ -577,6 +643,7 @@ public class PMWindow extends JFrame {
 					 Connection conn = PMDatabase.connect();
 					 try 
 					 {
+						 //TODO write mouse listener for selected table row and have them deleted
 						PreparedStatement pstmt = conn.prepareStatement("");
 					 } 
 					 catch (SQLException e1) 
