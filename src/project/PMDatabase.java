@@ -39,13 +39,13 @@ public class PMDatabase
 		try 
 		{
 			Statement stmt = conn.createStatement();
-			stmt.execute("CREATE TABLE IF NOT EXISTS Project (projectID INTEGER PRIMARY KEY AUTOINCREMENT, acronym TEXT, title TEXT, description TEXT, startingDate TEXT, endDate TEXT)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS Project (projectID INTEGER PRIMARY KEY AUTOINCREMENT, acronym TEXT, title TEXT, startdate DATE, enddate DATE, description TEXT)");
 			stmt.close();
 			
 			stmt.execute("CREATE TABLE IF NOT EXISTS Person (personID INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, sex TEXT, email TEXT, phone TEXT, fax TEXT, username TEXT, password TEXT)");
 			stmt.close();
 			
-			stmt.execute("CREATE TABLE IF NOT EXISTS Person_Project (personID INTEGER, projectID INTEGER, FOREIGN KEY(personID) REFERENCES Person(personID) ON UPDATE CASCADE, FOREIGN KEY(projectID) REFERENCES Project(projectID) ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS Person_Project (personID INTEGER, projectID INTEGER, FOREIGN KEY(personID) REFERENCES Person(personID) ON DELETE CASCADE, FOREIGN KEY(projectID) REFERENCES Project(projectID) ON DELETE CASCADE)");
 			stmt.close();
 			System.out.println("Tables have been created successfully.");
 			conn.close();
@@ -93,16 +93,16 @@ public class PMDatabase
 		try 
 		{
 			modelProject.setRowCount(0);
-			PreparedStatement pStmt = conn.prepareStatement("SELECT projectID, acronym, title, description, startingDate, endDate FROM Project");
+			PreparedStatement pStmt = conn.prepareStatement("SELECT projectID, acronym, title, startdate, enddate, description FROM Project");
 			ResultSet rs = pStmt.executeQuery();
 			while(rs.next()) {
 				Object[] row = {
 						rs.getInt("projectID"),
 						rs.getString("acronym"),
 						rs.getString("title"),
-						rs.getString("description"),
-						rs.getString("startingDate"),
-						rs.getString("endDate")
+						rs.getString("startdate"),
+						rs.getString("endDate"),
+						rs.getString("description")
 				};
 				modelProject.addRow(row);
 			}
