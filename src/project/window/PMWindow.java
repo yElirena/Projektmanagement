@@ -67,7 +67,7 @@ public class PMWindow extends JFrame {
 	private JTextField tfUsername;
 	private JLabel lblPassword;
 	private JTextField tfPassword;
-	private JLabel lblProjectName;
+	private JLabel lblCollaborators;
 	private JButton btnUpdate;
 	private JButton btnDelete;
 	private JLabel lblProject;
@@ -86,8 +86,8 @@ public class PMWindow extends JFrame {
 	private JButton btnSave;
 	private List<JTextField> tfList = new ArrayList<JTextField>();
 	private JScrollPane scpDescription;
-	private JScrollPane scpProjects;
-	private JTextArea taProjects;
+	private JScrollPane scpCollab;
+	private JTextArea taCollabs;
 	private JTextArea taDescription;
 	private JTable tablePerson;
 	private String[] personHeaders;
@@ -111,6 +111,7 @@ public class PMWindow extends JFrame {
 	private String startdate;
 	private String enddate;
 	private String description;
+	private String collaborators;
 	private int projectID;
 	private int personID;
 
@@ -143,7 +144,7 @@ public class PMWindow extends JFrame {
 	private void initWindow() {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 500, 800);
+		setBounds(100, 100, 1000, 900);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
@@ -226,8 +227,8 @@ public class PMWindow extends JFrame {
 		tfPassword.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		tfPassword.setColumns(10);
 		
-		lblProjectName = new JLabel("Projects: ");
-		lblProjectName.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		lblCollaborators = new JLabel("Collaborators: ");
+		lblCollaborators.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
 		lblProject = new JLabel("Project");
 		lblProject.setFont(new Font("Times New Roman", Font.BOLD, 16));
@@ -284,7 +285,7 @@ public class PMWindow extends JFrame {
 		btnSave.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnSave.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
-		scpProjects = new JScrollPane();
+		scpCollab = new JScrollPane();
 		
 		scpDescription = new JScrollPane();
 		GroupLayout gl_topPanel = new GroupLayout(topPanel);
@@ -295,61 +296,64 @@ public class PMWindow extends JFrame {
 					.addComponent(lblTopTitle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGap(379))
 				.addGroup(gl_topPanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblLastname, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblSex)
-						.addComponent(lblPhone, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblFax, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblUsername)
-						.addComponent(lblPassword)
-						.addComponent(lblProjectName)
-						.addComponent(lblFirstname, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblEmail, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
-					.addGap(25)
-					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_topPanel.createSequentialGroup()
-							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbSex, 0, 254, Short.MAX_VALUE)
-								.addComponent(tfFirstname, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfPassword, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfUsername, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfFax, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfPhone, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfLastname, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addComponent(tfEmail, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
-							.addGap(60)
-							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
-								.addGroup(gl_topPanel.createSequentialGroup()
-									.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblAcronym)
-										.addComponent(lblStartdate)
-										.addComponent(lblTitle)
-										.addComponent(lblEnddate))
-									.addGap(18)
-									.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
-										.addComponent(tfEnddate)
-										.addComponent(tfStartdate)
-										.addComponent(tfTitle)
-										.addComponent(tfAcronym, GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)))
-								.addGroup(gl_topPanel.createSequentialGroup()
-									.addComponent(lblDescription)
-									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(scpDescription, GroupLayout.PREFERRED_SIZE, 235, GroupLayout.PREFERRED_SIZE))))
-						.addComponent(scpProjects, GroupLayout.PREFERRED_SIZE, 254, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
-				.addGroup(gl_topPanel.createSequentialGroup()
 					.addGap(223)
 					.addComponent(lblPerson, GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
 					.addGap(339)
 					.addComponent(lblProject)
 					.addGap(133))
-				.addGroup(gl_topPanel.createSequentialGroup()
-					.addContainerGap(290, Short.MAX_VALUE)
-					.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addGap(337))
+				.addGroup(Alignment.LEADING, gl_topPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_topPanel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+						.addGroup(Alignment.LEADING, gl_topPanel.createSequentialGroup()
+							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblLastname, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblSex)
+								.addComponent(lblPhone, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblFax, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblUsername)
+								.addComponent(lblPassword)
+								.addComponent(lblFirstname, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblEmail, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
+							.addGap(25)
+							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(cbSex, 0, 236, Short.MAX_VALUE)
+								.addComponent(tfFirstname, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+								.addComponent(tfPassword, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+								.addComponent(tfUsername, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+								.addComponent(tfFax, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+								.addComponent(tfPhone, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+								.addComponent(tfLastname, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+								.addComponent(tfEmail, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE))))
+					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_topPanel.createSequentialGroup()
+							.addGap(60)
+							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_topPanel.createParallelGroup(Alignment.TRAILING)
+									.addGroup(gl_topPanel.createSequentialGroup()
+										.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+											.addComponent(lblAcronym)
+											.addComponent(lblStartdate)
+											.addComponent(lblTitle)
+											.addComponent(lblEnddate))
+										.addGap(18))
+									.addGroup(gl_topPanel.createSequentialGroup()
+										.addComponent(lblDescription)
+										.addGap(29)))
+								.addComponent(lblCollaborators))
+							.addGap(33)
+							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(scpDescription)
+								.addComponent(scpCollab)
+								.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
+									.addComponent(tfEnddate)
+									.addComponent(tfStartdate)
+									.addComponent(tfTitle)
+									.addComponent(tfAcronym, GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))))
+						.addGroup(gl_topPanel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
 		);
 		gl_topPanel.setVerticalGroup(
 			gl_topPanel.createParallelGroup(Alignment.TRAILING)
@@ -400,30 +404,28 @@ public class PMWindow extends JFrame {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblUsername)
-								.addComponent(tfUsername, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblPassword)
-								.addComponent(tfPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblProjectName)
-								.addComponent(scpProjects, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
-							.addGap(35)
-							.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnCancel)
-								.addComponent(btnSave)))
-						.addComponent(scpDescription, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-					.addGap(14))
+								.addComponent(tfUsername, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(scpDescription, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblPassword)
+						.addComponent(tfPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblCollaborators)
+						.addComponent(scpCollab, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE))
+					.addGap(41)
+					.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnSave)
+						.addComponent(btnCancel))
+					.addGap(23))
 		);
 		
 		taDescription = new JTextArea();
 		taDescription.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		scpDescription.setViewportView(taDescription);
 		
-		taProjects = new JTextArea();
-		taProjects.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		scpProjects.setViewportView(taProjects);
+		taCollabs = new JTextArea();
+		taCollabs.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+		scpCollab.setViewportView(taCollabs);
 		topPanel.setLayout(gl_topPanel);
 		
 		bottomPanel = new JPanel();
@@ -546,12 +548,14 @@ public class PMWindow extends JFrame {
 						startdate = tablePerson.getValueAt(row, 3).toString();
 						enddate = tablePerson.getValueAt(row, 4).toString();
 						description = tablePerson.getValueAt(row, 5).toString();
+						collaborators = tablePerson.getValueAt(row, 6).toString();
 						
 						tfAcronym.setText(acronym);
 						tfTitle.setText(title);
 						tfStartdate.setText(startdate);
 						tfEnddate.setText(enddate);
 						taDescription.setText(description);
+						taCollabs.setText(collaborators);
 					}
 				}
 			}
@@ -716,7 +720,7 @@ public class PMWindow extends JFrame {
 			 tf.setText("");
 		 }
 		 cbSex.setSelectedIndex(0);
-		 taProjects.setText("");
+		 taCollabs.setText("");
 		 taDescription.setText("");
 	}
 }
