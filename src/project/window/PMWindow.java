@@ -98,6 +98,19 @@ public class PMWindow extends JFrame {
 	private DefaultTableModel modelProject;
 	private JButton btnChangeTable;
 	private boolean isFirstTable = true;
+	private String firstname;
+	private String lastname;
+	private Object sex;
+	private String email;
+	private String phone;
+	private String fax;
+	private String username;
+	private String password;
+	private String acronym;
+	private String title;
+	private String startdate;
+	private String enddate;
+	private String description;
 
 
 	/**
@@ -472,7 +485,7 @@ public class PMWindow extends JFrame {
 		modelPerson.setColumnIdentifiers(personHeaders);
 		
 		
-		projectHeaders = new String[] {"ID", "Acronym", "Title", "Description", "Starting Date", "End Date", "Collaborators"};
+		projectHeaders = new String[] {"ID", "Acronym", "Title", "Starting Date", "End Date", "Description", "Collaborators"};
 		numProjectRows = 0;
 		modelProject = new DefaultTableModel(numProjectRows, projectHeaders.length) 
 		{
@@ -503,17 +516,17 @@ public class PMWindow extends JFrame {
 				{
 					if(row >= 0 && col >= 0) 
 					{
-						String firstname = tablePerson.getValueAt(row, 1).toString();
-						String lastname = tablePerson.getValueAt(row, 2).toString();
-						Object gender = tablePerson.getValueAt(row, 3);
-						String email = tablePerson.getValueAt(row, 4).toString();
-						String phone = tablePerson.getValueAt(row, 5).toString();
-						String fax = tablePerson.getValueAt(row, 6).toString();
-						String username = tablePerson.getValueAt(row, 7).toString();						
+						firstname = tablePerson.getValueAt(row, 1).toString();
+						lastname = tablePerson.getValueAt(row, 2).toString();
+						sex = tablePerson.getValueAt(row, 3);
+						email = tablePerson.getValueAt(row, 4).toString();
+						phone = tablePerson.getValueAt(row, 5).toString();
+						fax = tablePerson.getValueAt(row, 6).toString();
+						username = tablePerson.getValueAt(row, 7).toString();						
 						
 						tfFirstname.setText(firstname);
 						tfLastname.setText(lastname);
-						cbSex.setSelectedItem(gender);
+						cbSex.setSelectedItem(sex);
 						tfEmail.setText(email);
 						tfPhone.setText(phone);
 						tfFax.setText(fax);
@@ -524,11 +537,11 @@ public class PMWindow extends JFrame {
 				{
 					if(row >= 0 && col >= 0) 
 					{
-						String acronym = tablePerson.getValueAt(row, 1).toString();
-						String title = tablePerson.getValueAt(row, 2).toString();
-						String startdate = tablePerson.getValueAt(row, 3).toString();
-						String enddate = tablePerson.getValueAt(row, 4).toString();
-						String description = tablePerson.getValueAt(row, 5).toString();
+						acronym = tablePerson.getValueAt(row, 1).toString();
+						title = tablePerson.getValueAt(row, 2).toString();
+						startdate = tablePerson.getValueAt(row, 3).toString();
+						enddate = tablePerson.getValueAt(row, 4).toString();
+						description = tablePerson.getValueAt(row, 5).toString();
 						
 						tfAcronym.setText(acronym);
 						tfTitle.setText(title);
@@ -583,16 +596,16 @@ public class PMWindow extends JFrame {
 					{
 						String acronym = tfAcronym.getText();
 						String title = tfTitle.getText();
-						String description = taDescription.getText();
 						String startdate = tfStartdate.getText();
 						String endDate = tfEnddate.getText();
+						String description = taDescription.getText();
 						
-						pstmt = conn.prepareStatement("INSERT INTO Project (acronym, title, description, startingDate, endDate) VALUES (?,?,?,?,?)");
+						pstmt = conn.prepareStatement("INSERT INTO Project (acronym, title, startdate, enddate, description) VALUES (?,?,?,?,?)");
 						pstmt.setString(1, acronym);
 						pstmt.setString(2, title);
-						pstmt.setString(3, description);
-						pstmt.setString(4, startdate);
-						pstmt.setString(5,  endDate);
+						pstmt.setString(3, startdate);
+						pstmt.setString(4,  endDate);
+						pstmt.setString(5, description);
 						pstmt.execute();
 						pstmt.close();
 						
