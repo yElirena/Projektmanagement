@@ -42,6 +42,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import javax.swing.border.BevelBorder;
@@ -114,6 +115,7 @@ public class PMWindow extends JFrame {
 	private String collaborators;
 	private int projectID;
 	private int personID;
+	private JButton btnAddCollab;
 
 
 	/**
@@ -288,9 +290,13 @@ public class PMWindow extends JFrame {
 		scpCollab = new JScrollPane();
 		
 		scpDescription = new JScrollPane();
+		
+		btnAddCollab = new JButton("Add Collaborators");
+		btnAddCollab.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
+		btnAddCollab.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		GroupLayout gl_topPanel = new GroupLayout(topPanel);
 		gl_topPanel.setHorizontalGroup(
-			gl_topPanel.createParallelGroup(Alignment.TRAILING)
+			gl_topPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_topPanel.createSequentialGroup()
 					.addGap(373)
 					.addComponent(lblTopTitle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -301,11 +307,10 @@ public class PMWindow extends JFrame {
 					.addGap(339)
 					.addComponent(lblProject)
 					.addGap(133))
-				.addGroup(Alignment.LEADING, gl_topPanel.createSequentialGroup()
+				.addGroup(gl_topPanel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_topPanel.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-						.addGroup(Alignment.LEADING, gl_topPanel.createSequentialGroup()
+						.addGroup(gl_topPanel.createSequentialGroup()
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblLastname, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblSex)
@@ -317,15 +322,16 @@ public class PMWindow extends JFrame {
 								.addComponent(lblEmail, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
 							.addGap(25)
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbSex, 0, 236, Short.MAX_VALUE)
-								.addComponent(tfFirstname, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
-								.addComponent(tfPassword, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
-								.addComponent(tfUsername, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
-								.addComponent(tfFax, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
-								.addComponent(tfPhone, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
-								.addComponent(tfLastname, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
-								.addComponent(tfEmail, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE))))
-					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(cbSex, 0, 221, Short.MAX_VALUE)
+								.addComponent(tfFirstname, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+								.addComponent(tfPassword, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+								.addComponent(tfUsername, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+								.addComponent(tfFax, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+								.addComponent(tfPhone, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+								.addComponent(tfLastname, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+								.addComponent(tfEmail, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)))
+						.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_topPanel.createSequentialGroup()
 							.addGap(60)
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
@@ -342,18 +348,20 @@ public class PMWindow extends JFrame {
 										.addGap(29)))
 								.addComponent(lblCollaborators))
 							.addGap(33)
-							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(tfEnddate)
+								.addComponent(tfStartdate)
+								.addComponent(tfTitle)
+								.addComponent(tfAcronym, GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
 								.addComponent(scpDescription)
-								.addComponent(scpCollab)
-								.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
-									.addComponent(tfEnddate)
-									.addComponent(tfStartdate)
-									.addComponent(tfTitle)
-									.addComponent(tfAcronym, GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))))
+								.addComponent(scpCollab))
+							.addContainerGap())
 						.addGroup(gl_topPanel.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
+							.addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(btnAddCollab)
+							.addGap(78))))
 		);
 		gl_topPanel.setVerticalGroup(
 			gl_topPanel.createParallelGroup(Alignment.TRAILING)
@@ -414,8 +422,9 @@ public class PMWindow extends JFrame {
 						.addComponent(scpCollab, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE))
 					.addGap(41)
 					.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnSave)
-						.addComponent(btnCancel))
+						.addComponent(btnCancel)
+						.addComponent(btnAddCollab)
+						.addComponent(btnSave))
 					.addGap(23))
 		);
 		
@@ -564,12 +573,12 @@ public class PMWindow extends JFrame {
 	
 	private void btnActions() 
 	{
+		Connection conn = PMDatabase.connect();
 		btnSave.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{					
-				try {
-					Connection conn = PMDatabase.connect();  
+				try {  
 					
 					PreparedStatement pstmt;
 				
@@ -653,6 +662,43 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		btnAddCollab.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				try 
+				{
+					String[] lastNames = taCollabs.getText().split("[,\\s\\r?\\n]+");
+					PreparedStatement pstmtInsert = conn.prepareStatement("INSERT INTO Person_Project (personID, projectID) VALUES (?,?)");
+					PreparedStatement pstmtPersonId = conn.prepareStatement("SELECT personID FROM Person WHERE lastname = ?");
+					for (String lastName : lastNames) 
+					{
+						lastName.toString();
+						pstmtPersonId.setString(1, lastName);
+						ResultSet rsPersonId = pstmtPersonId.executeQuery();
+						if(rsPersonId.next()) 
+						{
+							int personID = rsPersonId.getInt("personID");
+							pstmtInsert.setInt(1, personID);
+							pstmtInsert.setInt(2,  projectID);
+							pstmtInsert.executeUpdate();
+						}
+						else 
+						{
+							JOptionPane.showMessageDialog(null, lastname + " does not exist in the database.");
+						}
+						rsPersonId.close();
+					}
+					pstmtPersonId.close();
+					pstmtInsert.close();
+					PMDatabase.fetchFromProjects(modelProject);
+				} 
+				catch (SQLException e1) 
+				{
+					e1.printStackTrace();
+				}
+			}
+		});
 		btnDelete.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e)
@@ -700,15 +746,12 @@ public class PMWindow extends JFrame {
 				if(isFirstTable) 
 				{
 					tablePerson.setModel(modelProject);
-					isFirstTable = false;
-					resetFields();
-					
+					isFirstTable = false;					
 				}
 				else 
 				{
 					tablePerson.setModel(modelPerson);
 					isFirstTable = true;
-					resetFields();
 				}
 			}
 		});						

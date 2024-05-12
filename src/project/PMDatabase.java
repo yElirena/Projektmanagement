@@ -105,7 +105,7 @@ public class PMDatabase
 				String enddate = rs.getString("enddate");
 				String description =rs.getString("description");
 				
-				PreparedStatement pStmt2 = conn.prepareStatement("SELECT p.lastname FROM PERSON p JOIN Person_Project pp ON p.personID = pp.personID WHERE pp.projectID = ?");
+				PreparedStatement pStmt2 = conn.prepareStatement("SELECT DISTINCT p.lastname FROM PERSON p JOIN Person_Project pp ON p.personID = pp.personID WHERE pp.projectID = ?");
 				pStmt2.setInt(1, projectID);
 				ResultSet rsCollab = pStmt2.executeQuery();
 				StringBuilder collaborators = new StringBuilder();
