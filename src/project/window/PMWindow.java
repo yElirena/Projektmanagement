@@ -21,6 +21,8 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import project.PMDatabase;
 import java.awt.Color;
@@ -114,6 +116,7 @@ public class PMWindow extends JFrame {
 	public PMWindow() {
 		
 		initWindow();
+		changeBtn();
 		try 
 		{
 			btnActions();
@@ -271,10 +274,12 @@ public class PMWindow extends JFrame {
 		btnCancel.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnCancel.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnCancel.setEnabled(false);
 		
 		btnSave = new JButton("Save");
 		btnSave.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnSave.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btnSave.setEnabled(false);
 		
 		scpCollab = new JScrollPane();
 		
@@ -606,7 +611,7 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromPerson(modelPerson);
 					} 
-					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
+					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty()) 
 					{
 						
 						String acronym = tfAcronym.getText();
@@ -659,7 +664,7 @@ public class PMWindow extends JFrame {
 			{
 				try 
 				{
-					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
+					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
 					{
 						String firstname = tfFirstname.getText();
 						String lastname = tfLastname.getText();
@@ -686,7 +691,7 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromPerson(modelPerson);						
 					}
-					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
+					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty())
 					{
 						String acronym = tfAcronym.getText();
 						String title = tfTitle.getText();
@@ -705,8 +710,8 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromProjects(modelProject);						
 					}
-					conn.close();
 					
+					conn.close();
 				} 
 				catch (SQLException e1) 
 				{
@@ -809,6 +814,403 @@ public class PMWindow extends JFrame {
 					tablePerson.setModel(modelPerson);
 					isFirstTable = true;
 				}
+			}
+		});
+	}
+	
+		
+	public void changeBtn() 
+	{
+		tfFirstname.getDocument().addDocumentListener(new DocumentListener() 
+		{
+
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfLastname.getDocument().addDocumentListener(new DocumentListener()
+
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfEmail.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfPhone.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfFax.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);	
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfUsername.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfPassword.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfAcronym.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfTitle.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);	
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfStartdate.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);	
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfEnddate.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		taDescription.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		taCollabs.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
 			}
 		});
 	}
