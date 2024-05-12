@@ -9,11 +9,19 @@ import java.sql.Statement;
 
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * The PMDatabase class provides methods to interact with the SQLite database used in the project management system.
+ */
 public class PMDatabase 
 {
 	
 	private static Connection conn;
 	
+	/**
+     * Establishes a connection to the SQLite database.
+     * 
+     * @return the database connection
+     */
 	public static Connection connect() 
 	{  
         try 
@@ -32,6 +40,10 @@ public class PMDatabase
 		}  
         return conn;
     }
+	
+	/**
+     * Creates necessary tables in the database if they do not exist.
+     */
 	public static void createTables() 
 	{
 		connect();
@@ -55,6 +67,12 @@ public class PMDatabase
 			e.printStackTrace();
 		}		
 	}
+	
+	 /**
+     * Retrieves data from the Person table and populates the given DefaultTableModel.
+     * 
+     * @param modelPerson the DefaultTableModel to populate with data from the Person table
+     */
 	public static void fetchFromPerson(DefaultTableModel modelPerson) 
 	{
 		connect();
@@ -86,6 +104,13 @@ public class PMDatabase
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+     * Retrieves data from the Project table and populates the given DefaultTableModel.
+     * Also retrieves collaborators associated with each project and adds them to the table.
+     * 
+     * @param modelProject the DefaultTableModel to populate with data from the Project table
+     */
 	public static void fetchFromProjects(DefaultTableModel modelProject) 
 	{
 		connect();
@@ -140,6 +165,9 @@ public class PMDatabase
 		}		
 	}
 	
+	  /**
+     * Closes the database connection.
+     */
 	public static void closeConn() 
 	{
 		try 
@@ -150,10 +178,4 @@ public class PMDatabase
 			e.printStackTrace();
 		}
 	}
-	public static void main(String[] args) 
-	{
-		//connect();
-		//createTables();
-	}
-
 }

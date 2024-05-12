@@ -1,7 +1,9 @@
 package project;
 
 
-
+/**
+ * The Project class represents a person entity with various attributes as well as getter and setter.
+ */
 public class Project {
 	private int projectID;
 	private String acronym;

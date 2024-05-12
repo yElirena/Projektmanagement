@@ -108,23 +108,8 @@ public class PMWindow extends JFrame {
 
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					PMWindow frame = new PMWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
+	 * The PMWindow class represents the main window of the project management application.
+	 * It provides functionality for managing projects and collaborators.
 	 */
 	public PMWindow() {
 		
@@ -139,8 +124,12 @@ public class PMWindow extends JFrame {
 		}
 	}
 	
+	 /**
+     * Initializes all Swing components used in the PMWindow.
+     */
 	private void initWindow() {
 		
+		//Set the size of the frame
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 900);
 		contentPane = new JPanel();
@@ -148,6 +137,7 @@ public class PMWindow extends JFrame {
 		
 		setContentPane(contentPane);
 		
+		//setup for the splitpane
 		splitPane = new JSplitPane();
 		splitPane.setBorder(new LineBorder(new Color(0, 0, 0)));
 		splitPane.setResizeWeight(0.5);
@@ -155,12 +145,14 @@ public class PMWindow extends JFrame {
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		contentPane.add(splitPane);
 		
+		//set up for the top panel
 		topPanel = new JPanel();
 		topPanel.setPreferredSize(new Dimension(32767, 16383));
 		topPanel.setMinimumSize(new Dimension(32767, 16383));
 		topPanel.setMaximumSize(new Dimension(32767, 16383));
 		splitPane.setLeftComponent(topPanel);
 		
+		//Labels, Textfields, Combobox, Buttons for the top panel
 		lblTopTitle = new JLabel("Form");
 		lblTopTitle.setFont(new Font("Times New Roman", Font.BOLD, 24));
 		
@@ -259,6 +251,7 @@ public class PMWindow extends JFrame {
 		tfEnddate.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		tfEnddate.setColumns(10);
 		
+		//adding the textfields to a list to make iterating through them easier later on
 		tfList.add(tfFirstname);
 		tfList.add(tfLastname);
 		tfList.add(tfEmail);
@@ -433,6 +426,7 @@ public class PMWindow extends JFrame {
 		scpCollab.setViewportView(taCollabs);
 		topPanel.setLayout(gl_topPanel);
 		
+		//setup for the bottom panel with the table
 		bottomPanel = new JPanel();
 		bottomPanel.setMinimumSize(new Dimension(32767, 16383));
 		bottomPanel.setMaximumSize(new Dimension(32767, 16383));
@@ -481,6 +475,7 @@ public class PMWindow extends JFrame {
 					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		
+		//setup for the two tables
 		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username"};
 		numPersonRows = 0;
 		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length) 
@@ -506,6 +501,7 @@ public class PMWindow extends JFrame {
 		};
 		modelProject.setColumnIdentifiers(projectHeaders);
 		
+		//initializing the tables from the database
 		PMDatabase.fetchFromPerson(modelPerson);
 		PMDatabase.fetchFromProjects(modelProject);
 		
@@ -514,6 +510,7 @@ public class PMWindow extends JFrame {
 		scpTable.setViewportView(tablePerson);
 		bottomPanel.setLayout(gl_bottomPanel);
 		
+		//MouseEvent for the table to fill the textfields when a row is selected
 		tablePerson.addMouseListener(new MouseAdapter() 
 		{
 			@Override
@@ -567,11 +564,13 @@ public class PMWindow extends JFrame {
 		});
 	}
 	
+	
+	//Button actions
 	private void btnActions() throws SQLException 
 	{
 		Connection conn = PMDatabase.connect();
 		
-		
+		//saving the textfields to the database
 		btnSave.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -638,6 +637,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//resetting the textfields if the user confirms they are sure they want the information erased
 		btnCancel.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -652,6 +652,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//updating the information in case the information was changed
 		btnUpdate.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -714,6 +715,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//adding collaborators to a project
 		btnAddCollab.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -752,6 +754,8 @@ public class PMWindow extends JFrame {
 				}
 			}
 		});
+		
+		//deleting a row out of the table with a message asking if the user is sure
 		btnDelete.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e)
@@ -790,6 +794,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//switching the view between the table containing the employees and the table containing the projects
 		btnChangeTable.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -807,6 +812,8 @@ public class PMWindow extends JFrame {
 			}
 		});
 	}
+	
+	//empties the form fields
 	public void resetFields() 
 	{
 		for(JTextField tf : tfList)
@@ -819,6 +826,7 @@ public class PMWindow extends JFrame {
 	}
 }
 
+//class for the functionality of the combobox
 class DialogModel extends DefaultComboBoxModel<Object> 
 {
 	
