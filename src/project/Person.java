@@ -1,5 +1,9 @@
 package project;
 
+
+/**
+ * The Person class represents a person entity with various attributes and getter and setter.
+ */
 public class Person 
 {
 	private int personid;

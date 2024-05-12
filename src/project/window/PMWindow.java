@@ -21,6 +21,8 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import project.PMDatabase;
 import java.awt.Color;
@@ -108,27 +110,13 @@ public class PMWindow extends JFrame {
 
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					PMWindow frame = new PMWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
+	 * The PMWindow class represents the main window of the project management application.
+	 * It provides functionality for managing projects and collaborators.
 	 */
 	public PMWindow() {
 		
 		initWindow();
+		changeBtn();
 		try 
 		{
 			btnActions();
@@ -139,8 +127,12 @@ public class PMWindow extends JFrame {
 		}
 	}
 	
+	 /**
+     * Initializes all Swing components used in the PMWindow.
+     */
 	private void initWindow() {
 		
+		//Set the size of the frame
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 900);
 		contentPane = new JPanel();
@@ -148,6 +140,7 @@ public class PMWindow extends JFrame {
 		
 		setContentPane(contentPane);
 		
+		//setup for the splitpane
 		splitPane = new JSplitPane();
 		splitPane.setBorder(new LineBorder(new Color(0, 0, 0)));
 		splitPane.setResizeWeight(0.5);
@@ -155,12 +148,14 @@ public class PMWindow extends JFrame {
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		contentPane.add(splitPane);
 		
+		//set up for the top panel
 		topPanel = new JPanel();
 		topPanel.setPreferredSize(new Dimension(32767, 16383));
 		topPanel.setMinimumSize(new Dimension(32767, 16383));
 		topPanel.setMaximumSize(new Dimension(32767, 16383));
 		splitPane.setLeftComponent(topPanel);
 		
+		//Labels, Textfields, Combobox, Buttons for the top panel
 		lblTopTitle = new JLabel("Form");
 		lblTopTitle.setFont(new Font("Times New Roman", Font.BOLD, 24));
 		
@@ -259,6 +254,7 @@ public class PMWindow extends JFrame {
 		tfEnddate.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		tfEnddate.setColumns(10);
 		
+		//adding the textfields to a list to make iterating through them easier later on
 		tfList.add(tfFirstname);
 		tfList.add(tfLastname);
 		tfList.add(tfEmail);
@@ -278,10 +274,12 @@ public class PMWindow extends JFrame {
 		btnCancel.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnCancel.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnCancel.setEnabled(false);
 		
 		btnSave = new JButton("Save");
 		btnSave.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
 		btnSave.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btnSave.setEnabled(false);
 		
 		scpCollab = new JScrollPane();
 		
@@ -433,6 +431,7 @@ public class PMWindow extends JFrame {
 		scpCollab.setViewportView(taCollabs);
 		topPanel.setLayout(gl_topPanel);
 		
+		//setup for the bottom panel with the table
 		bottomPanel = new JPanel();
 		bottomPanel.setMinimumSize(new Dimension(32767, 16383));
 		bottomPanel.setMaximumSize(new Dimension(32767, 16383));
@@ -481,6 +480,7 @@ public class PMWindow extends JFrame {
 					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		
+		//setup for the two tables
 		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username"};
 		numPersonRows = 0;
 		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length) 
@@ -506,6 +506,7 @@ public class PMWindow extends JFrame {
 		};
 		modelProject.setColumnIdentifiers(projectHeaders);
 		
+		//initializing the tables from the database
 		PMDatabase.fetchFromPerson(modelPerson);
 		PMDatabase.fetchFromProjects(modelProject);
 		
@@ -514,6 +515,7 @@ public class PMWindow extends JFrame {
 		scpTable.setViewportView(tablePerson);
 		bottomPanel.setLayout(gl_bottomPanel);
 		
+		//MouseEvent for the table to fill the textfields when a row is selected
 		tablePerson.addMouseListener(new MouseAdapter() 
 		{
 			@Override
@@ -567,11 +569,13 @@ public class PMWindow extends JFrame {
 		});
 	}
 	
+	
+	//Button actions
 	private void btnActions() throws SQLException 
 	{
 		Connection conn = PMDatabase.connect();
 		
-		
+		//saving the textfields to the database
 		btnSave.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -607,7 +611,7 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromPerson(modelPerson);
 					} 
-					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
+					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty()) 
 					{
 						
 						String acronym = tfAcronym.getText();
@@ -638,6 +642,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//resetting the textfields if the user confirms they are sure they want the information erased
 		btnCancel.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -652,13 +657,14 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//updating the information in case the information was changed
 		btnUpdate.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
 				try 
 				{
-					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
+					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
 					{
 						String firstname = tfFirstname.getText();
 						String lastname = tfLastname.getText();
@@ -685,7 +691,7 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromPerson(modelPerson);						
 					}
-					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
+					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty())
 					{
 						String acronym = tfAcronym.getText();
 						String title = tfTitle.getText();
@@ -704,8 +710,8 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromProjects(modelProject);						
 					}
-					conn.close();
 					
+					conn.close();
 				} 
 				catch (SQLException e1) 
 				{
@@ -714,6 +720,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//adding collaborators to a project
 		btnAddCollab.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -752,6 +759,8 @@ public class PMWindow extends JFrame {
 				}
 			}
 		});
+		
+		//deleting a row out of the table with a message asking if the user is sure
 		btnDelete.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e)
@@ -790,6 +799,7 @@ public class PMWindow extends JFrame {
 			}
 		});
 		
+		//switching the view between the table containing the employees and the table containing the projects
 		btnChangeTable.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -807,6 +817,405 @@ public class PMWindow extends JFrame {
 			}
 		});
 	}
+	
+		
+	public void changeBtn() 
+	{
+		tfFirstname.getDocument().addDocumentListener(new DocumentListener() 
+		{
+
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfLastname.getDocument().addDocumentListener(new DocumentListener()
+
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfEmail.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfPhone.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfFax.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);	
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfUsername.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfPassword.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfAcronym.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfTitle.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);	
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfStartdate.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);	
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		tfEnddate.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		taDescription.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+		taCollabs.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);	
+				tablePerson.setRowSelectionAllowed(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) 
+			{
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				tablePerson.setRowSelectionAllowed(true);
+				
+			}
+		});
+	}
+	
+	//empties the form fields
 	public void resetFields() 
 	{
 		for(JTextField tf : tfList)
@@ -819,6 +1228,7 @@ public class PMWindow extends JFrame {
 	}
 }
 
+//class for the functionality of the combobox
 class DialogModel extends DefaultComboBoxModel<Object> 
 {
 	
