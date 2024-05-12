@@ -6,9 +6,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import java.awt.Dimension;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -23,24 +20,16 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
-import javax.swing.JScrollBar;
 import javax.swing.border.LineBorder;
 import javax.swing.table.*;
-
 import project.PMDatabase;
-
 import java.awt.Color;
 import javax.swing.JTable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -140,7 +129,14 @@ public class PMWindow extends JFrame {
 	public PMWindow() {
 		
 		initWindow();
-		btnActions();
+		try 
+		{
+			btnActions();
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	private void initWindow() {
@@ -571,9 +567,11 @@ public class PMWindow extends JFrame {
 		});
 	}
 	
-	private void btnActions() 
+	private void btnActions() throws SQLException 
 	{
 		Connection conn = PMDatabase.connect();
+		
+		
 		btnSave.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -584,6 +582,8 @@ public class PMWindow extends JFrame {
 				
 					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
 					{
+						
+							
 						String firstname = tfFirstname.getText();
 						String lastname = tfLastname.getText();
 						String gender = (String) cbSex.getSelectedItem();
@@ -592,8 +592,6 @@ public class PMWindow extends JFrame {
 						String fax = tfFax.getText();
 						String username = tfUsername.getText();
 						String password = tfPassword.getText();
-						
-							
 						pstmt = conn.prepareStatement("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) "
 										+ "VALUES (?,?,?,?,?,?,?,?)");
 						pstmt.setString(1, firstname);
@@ -609,14 +607,14 @@ public class PMWindow extends JFrame {
 						
 						PMDatabase.fetchFromPerson(modelPerson);
 					} 
-					if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty()) 
+					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
 					{
+						
 						String acronym = tfAcronym.getText();
 						String title = tfTitle.getText();
 						String startdate = tfStartdate.getText();
 						String endDate = tfEnddate.getText();
 						String description = taDescription.getText();
-						
 						pstmt = conn.prepareStatement("INSERT INTO Project (acronym, title, startdate, enddate, description) VALUES (?,?,?,?,?)");
 						pstmt.setString(1, acronym);
 						pstmt.setString(2, title);
@@ -658,7 +656,61 @@ public class PMWindow extends JFrame {
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				
+				try 
+				{
+					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
+					{
+						String firstname = tfFirstname.getText();
+						String lastname = tfLastname.getText();
+						String gender = (String) cbSex.getSelectedItem();
+						String email = tfEmail.getText();
+						String phone = tfPhone.getText();
+						String fax = tfFax.getText();
+						String username = tfUsername.getText();
+						String password = tfPassword.getText();
+						
+						PreparedStatement pstmtUpdate = conn.prepareStatement("UPDATE Person SET firstname = ?, lastname = ?, sex = ?, email = ?, phone = ?, fax = ?, username = ?, password = ? WHERE personID = ?");
+						
+						pstmtUpdate.setString(1, firstname);
+						pstmtUpdate.setString(2, lastname);
+						pstmtUpdate.setString(3, gender);
+						pstmtUpdate.setString(4, email);
+						pstmtUpdate.setString(5, phone);
+						pstmtUpdate.setString(6, fax);
+						pstmtUpdate.setString(7, username);
+						pstmtUpdate.setString(8, password);
+						pstmtUpdate.setInt(9, personID);
+						pstmtUpdate.executeUpdate();
+						pstmtUpdate.close();
+						
+						PMDatabase.fetchFromPerson(modelPerson);						
+					}
+					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
+					{
+						String acronym = tfAcronym.getText();
+						String title = tfTitle.getText();
+						String startdate = tfStartdate.getText();
+						String endDate = tfEnddate.getText();
+						String description = taDescription.getText();
+						PreparedStatement pstmt = conn.prepareStatement("UPDATE Project SET acronym = ?, title = ?, startdate = ?, enddate = ?, description = ? WHERE projectID = ?");
+						pstmt.setString(1, acronym);
+						pstmt.setString(2, title);
+						pstmt.setString(3, startdate);
+						pstmt.setString(4,  endDate);
+						pstmt.setString(5, description);
+						pstmt.setInt(6, projectID);
+						pstmt.executeUpdate();
+						pstmt.close();
+						
+						PMDatabase.fetchFromProjects(modelProject);						
+					}
+					conn.close();
+					
+				} 
+				catch (SQLException e1) 
+				{
+					e1.printStackTrace();
+				}
 			}
 		});
 		
@@ -692,6 +744,7 @@ public class PMWindow extends JFrame {
 					pstmtPersonId.close();
 					pstmtInsert.close();
 					PMDatabase.fetchFromProjects(modelProject);
+					conn.close();
 				} 
 				catch (SQLException e1) 
 				{
@@ -707,7 +760,6 @@ public class PMWindow extends JFrame {
 				 returnValue = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this entry?", "Are you sure?", JOptionPane.YES_NO_OPTION);
 				 if(returnValue == JOptionPane.YES_OPTION) 
 				 {
-					 Connection conn = PMDatabase.connect();
 					 try 
 					 {
 						if(isFirstTable) {
@@ -726,14 +778,13 @@ public class PMWindow extends JFrame {
 							PMDatabase.fetchFromPerson(modelProject);
 						}
 						tablePerson.repaint();
-						conn.close();
 						resetFields();
+						conn.close();
 					 } 
 					 catch (SQLException e1) 
 					 {
 						e1.printStackTrace();
 					 }
-					 PMDatabase.closeConn();
 					 
 				 }
 			}
@@ -754,7 +805,7 @@ public class PMWindow extends JFrame {
 					isFirstTable = true;
 				}
 			}
-		});						
+		});
 	}
 	public void resetFields() 
 	{
