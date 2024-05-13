@@ -6,6 +6,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import java.awt.Dimension;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -25,12 +28,17 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import project.PMDatabase;
+import project.PasswordHash;
+
 import java.awt.Color;
 import javax.swing.JTable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -538,7 +546,7 @@ public class PMWindow extends JFrame {
 							email = tablePerson.getValueAt(row, 4).toString();
 							phone = tablePerson.getValueAt(row, 5).toString();
 							fax = tablePerson.getValueAt(row, 6).toString();
-							username = tablePerson.getValueAt(row, 7).toString();						
+							username = tablePerson.getValueAt(row, 7).toString();
 							
 							tfFirstname.setText(firstname);
 							tfLastname.setText(lastname);
@@ -600,7 +608,8 @@ public class PMWindow extends JFrame {
 						String phone = tfPhone.getText();
 						String fax = tfFax.getText();
 						String username = tfUsername.getText();
-						String password = tfPassword.getText();
+						String password = PasswordHash.generatePassword(tfPassword.getText());
+						
 						pstmt = conn.prepareStatement("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) "
 										+ "VALUES (?,?,?,?,?,?,?,?)");
 						pstmt.setString(1, firstname);
