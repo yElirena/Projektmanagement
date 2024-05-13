@@ -116,6 +116,7 @@ public class PMWindow extends JFrame {
 	private int personID;
 	private JButton btnAddCollab;
 	private boolean isMouseEventEnabled = true;
+	private boolean isUserInsert;
 
 
 	/**
@@ -490,7 +491,7 @@ public class PMWindow extends JFrame {
 		);
 		
 		//setup for the two tables
-		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username"};
+		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username", "Password"};
 		numPersonRows = 0;
 		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length) 
 		{
@@ -532,7 +533,10 @@ public class PMWindow extends JFrame {
 			{
 				if(isMouseEventEnabled) 
 				{
+					setUserInput(false);
+					//isUserInsert = false;
 					
+					//changeButtonState(isUserInsert);
 					int row = tablePerson.rowAtPoint(e.getPoint());
 					int col = tablePerson.columnAtPoint(e.getPoint());
 					if(isFirstTable) 
@@ -547,6 +551,7 @@ public class PMWindow extends JFrame {
 							phone = tablePerson.getValueAt(row, 5).toString();
 							fax = tablePerson.getValueAt(row, 6).toString();
 							username = tablePerson.getValueAt(row, 7).toString();
+							password = (String) tablePerson.getValueAt(row, 8);
 							
 							tfFirstname.setText(firstname);
 							tfLastname.setText(lastname);
@@ -555,6 +560,7 @@ public class PMWindow extends JFrame {
 							tfPhone.setText(phone);
 							tfFax.setText(fax);
 							tfUsername.setText(username);
+							tfPassword.setText(password);
 						}
 					}
 					else if(!isFirstTable) 
@@ -596,19 +602,19 @@ public class PMWindow extends JFrame {
 				try {  
 					
 					PreparedStatement pstmt;
+					String firstname = tfFirstname.getText();
+					String lastname = tfLastname.getText();
+					String gender = (String) cbSex.getSelectedItem();
+					String email = tfEmail.getText();
+					String phone = tfPhone.getText();
+					String fax = tfFax.getText();
+					String username = tfUsername.getText();
+					String password = PasswordHash.generatePassword(tfPassword.getText());
 				
-					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
+					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
 					{
 						
 							
-						String firstname = tfFirstname.getText();
-						String lastname = tfLastname.getText();
-						String gender = (String) cbSex.getSelectedItem();
-						String email = tfEmail.getText();
-						String phone = tfPhone.getText();
-						String fax = tfFax.getText();
-						String username = tfUsername.getText();
-						String password = PasswordHash.generatePassword(tfPassword.getText());
 						
 						pstmt = conn.prepareStatement("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) "
 										+ "VALUES (?,?,?,?,?,?,?,?)");
@@ -687,7 +693,7 @@ public class PMWindow extends JFrame {
 						String phone = tfPhone.getText();
 						String fax = tfFax.getText();
 						String username = tfUsername.getText();
-						String password = tfPassword.getText();
+						String password = PasswordHash.generatePassword(tfPassword.getText());
 						
 						PreparedStatement pstmtUpdate = conn.prepareStatement("UPDATE Person SET firstname = ?, lastname = ?, sex = ?, email = ?, phone = ?, fax = ?, username = ?, password = ? WHERE personID = ?");
 						
@@ -841,28 +847,31 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				isMouseEventEnabled = true;
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				tablePerson.setRowSelectionAllowed(true);
+//				isMouseEventEnabled = true;
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
+				btnDelete.setEnabled(false);
+				btnSave.setEnabled(true);
+				btnCancel.setEnabled(true);
 				tablePerson.setRowSelectionAllowed(true);
 				isMouseEventEnabled = true;
 				
@@ -874,10 +883,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -904,10 +916,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -934,10 +949,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -964,10 +982,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -994,10 +1015,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1024,10 +1048,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1054,10 +1081,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1084,10 +1114,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1114,10 +1147,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1144,10 +1180,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1174,10 +1213,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1204,10 +1246,13 @@ public class PMWindow extends JFrame {
 			@Override
 			public void insertUpdate(DocumentEvent e) 
 			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				isMouseEventEnabled = false;
+				if(isUserInsert) 
+				{
+					btnDelete.setEnabled(false);
+					btnSave.setEnabled(true);
+					btnCancel.setEnabled(true);
+					isMouseEventEnabled = false;					
+				}
 			}
 
 			@Override
@@ -1241,6 +1286,16 @@ public class PMWindow extends JFrame {
 		 cbSex.setSelectedIndex(0);
 		 taCollabs.setText("");
 		 taDescription.setText("");
+	}
+	
+	public void changeButtonState( boolean isUserInput) {
+		btnSave.setEnabled(!isUserInput);
+		btnCancel.setEnabled(!isUserInput);
+	}
+	
+	public void setUserInput( boolean active) {
+		this.isUserInsert = active;
+		changeButtonState(active);
 	}
 }
 

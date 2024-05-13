@@ -80,7 +80,7 @@ public class PMDatabase
 		try 
 		{
 			modelPerson.setRowCount(0);
-			PreparedStatement pStmt = conn.prepareStatement("SELECT personID, firstname, lastname, sex, email, phone, fax, username FROM Person");
+			PreparedStatement pStmt = conn.prepareStatement("SELECT personID, firstname, lastname, sex, email, phone, fax, username, password FROM Person");
 			ResultSet rs = pStmt.executeQuery();
 			while(rs.next()) {
 				Object[] row = {
@@ -91,7 +91,8 @@ public class PMDatabase
 						rs.getString("email"),
 						rs.getString("phone"),
 						rs.getString("fax"),
-						rs.getString("username")
+						rs.getString("username"),
+						rs.getString("password")
 				};
 				modelPerson.addRow(row);
 			}
