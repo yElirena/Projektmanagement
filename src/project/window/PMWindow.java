@@ -107,6 +107,7 @@ public class PMWindow extends JFrame {
 	private int projectID;
 	private int personID;
 	private JButton btnAddCollab;
+	private boolean isMouseEventEnabled = true;
 
 
 	/**
@@ -521,48 +522,52 @@ public class PMWindow extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) 
 			{
-				int row = tablePerson.rowAtPoint(e.getPoint());
-				int col = tablePerson.columnAtPoint(e.getPoint());
-				if(isFirstTable) 
+				if(isMouseEventEnabled) 
 				{
-					if(row >= 0 && col >= 0) 
+					
+					int row = tablePerson.rowAtPoint(e.getPoint());
+					int col = tablePerson.columnAtPoint(e.getPoint());
+					if(isFirstTable) 
 					{
-						personID = (int) tablePerson.getValueAt(row, 0);
-						firstname = tablePerson.getValueAt(row, 1).toString();
-						lastname = tablePerson.getValueAt(row, 2).toString();
-						sex = tablePerson.getValueAt(row, 3);
-						email = tablePerson.getValueAt(row, 4).toString();
-						phone = tablePerson.getValueAt(row, 5).toString();
-						fax = tablePerson.getValueAt(row, 6).toString();
-						username = tablePerson.getValueAt(row, 7).toString();						
-						
-						tfFirstname.setText(firstname);
-						tfLastname.setText(lastname);
-						cbSex.setSelectedItem(sex);
-						tfEmail.setText(email);
-						tfPhone.setText(phone);
-						tfFax.setText(fax);
-						tfUsername.setText(username);
+						if(row >= 0 && col >= 0) 
+						{
+							personID = (int) tablePerson.getValueAt(row, 0);
+							firstname = tablePerson.getValueAt(row, 1).toString();
+							lastname = tablePerson.getValueAt(row, 2).toString();
+							sex = tablePerson.getValueAt(row, 3);
+							email = tablePerson.getValueAt(row, 4).toString();
+							phone = tablePerson.getValueAt(row, 5).toString();
+							fax = tablePerson.getValueAt(row, 6).toString();
+							username = tablePerson.getValueAt(row, 7).toString();						
+							
+							tfFirstname.setText(firstname);
+							tfLastname.setText(lastname);
+							cbSex.setSelectedItem(sex);
+							tfEmail.setText(email);
+							tfPhone.setText(phone);
+							tfFax.setText(fax);
+							tfUsername.setText(username);
+						}
 					}
-				}
-				else if(!isFirstTable) 
-				{
-					if(row >= 0 && col >= 0) 
+					else if(!isFirstTable) 
 					{
-						projectID = (int) tablePerson.getValueAt(row, 0);
-						acronym = tablePerson.getValueAt(row, 1).toString();
-						title = tablePerson.getValueAt(row, 2).toString();
-						startdate = tablePerson.getValueAt(row, 3).toString();
-						enddate = tablePerson.getValueAt(row, 4).toString();
-						description = tablePerson.getValueAt(row, 5).toString();
-						collaborators = tablePerson.getValueAt(row, 6).toString();
-						
-						tfAcronym.setText(acronym);
-						tfTitle.setText(title);
-						tfStartdate.setText(startdate);
-						tfEnddate.setText(enddate);
-						taDescription.setText(description);
-						taCollabs.setText(collaborators);
+						if(row >= 0 && col >= 0) 
+						{
+							projectID = (int) tablePerson.getValueAt(row, 0);
+							acronym = tablePerson.getValueAt(row, 1).toString();
+							title = tablePerson.getValueAt(row, 2).toString();
+							startdate = tablePerson.getValueAt(row, 3).toString();
+							enddate = tablePerson.getValueAt(row, 4).toString();
+							description = tablePerson.getValueAt(row, 5).toString();
+							collaborators = tablePerson.getValueAt(row, 6).toString();
+							
+							tfAcronym.setText(acronym);
+							tfTitle.setText(title);
+							tfStartdate.setText(startdate);
+							tfEnddate.setText(enddate);
+							taDescription.setText(description);
+							taCollabs.setText(collaborators);
+						}
 					}
 				}
 			}
@@ -829,8 +834,8 @@ public class PMWindow extends JFrame {
 			{
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				btnCancel.setEnabled(true);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -840,6 +845,7 @@ public class PMWindow extends JFrame {
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
 				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -849,6 +855,7 @@ public class PMWindow extends JFrame {
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
 				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -861,7 +868,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -870,7 +877,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -879,7 +886,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -891,7 +898,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -900,7 +907,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -909,7 +916,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -921,7 +928,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -930,7 +937,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -939,7 +946,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -951,7 +958,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -960,7 +967,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);	
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -969,7 +976,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -981,7 +988,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -990,7 +997,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -999,7 +1006,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -1011,7 +1018,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -1020,7 +1027,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -1029,7 +1036,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -1041,7 +1048,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -1050,7 +1057,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -1059,7 +1066,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -1071,7 +1078,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -1080,7 +1087,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);	
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -1089,7 +1096,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -1101,7 +1108,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -1110,7 +1117,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);	
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -1119,7 +1126,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -1131,7 +1138,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -1140,7 +1147,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -1149,7 +1156,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -1161,7 +1168,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -1170,7 +1177,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -1179,7 +1186,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
@@ -1191,7 +1198,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(false);
 				btnSave.setEnabled(true);
 				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
+				isMouseEventEnabled = false;
 			}
 
 			@Override
@@ -1200,7 +1207,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 			}
 
 			@Override
@@ -1209,7 +1216,7 @@ public class PMWindow extends JFrame {
 				btnDelete.setEnabled(true);
 				btnSave.setEnabled(false);
 				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
+				isMouseEventEnabled = true;
 				
 			}
 		});
