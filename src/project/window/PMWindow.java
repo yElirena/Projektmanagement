@@ -17,10 +17,12 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
@@ -117,6 +119,8 @@ public class PMWindow extends JFrame {
 	private JButton btnAddCollab;
 	private boolean isMouseEventEnabled = true;
 	private boolean isUserInsert;
+	
+	HashMap<JComponent, MyDocumentListener> listeners = new HashMap<>();
 
 
 	/**
@@ -533,8 +537,8 @@ public class PMWindow extends JFrame {
 			{
 				if(isMouseEventEnabled) 
 				{
-					setUserInput(false);
-					//isUserInsert = false;
+					//setUserInput(false);
+					isUserInsert = false;
 					
 					//changeButtonState(isUserInsert);
 					int row = tablePerson.rowAtPoint(e.getPoint());
@@ -673,7 +677,13 @@ public class PMWindow extends JFrame {
 				 {
 					 resetFields();	 
 					 
-				 }			
+				 }
+				 
+				btnDelete.setEnabled(true);
+				btnSave.setEnabled(false);
+				btnCancel.setEnabled(false);
+				isMouseEventEnabled = true;
+				isUserInsert = false;
 			}
 		});
 		
@@ -841,462 +851,576 @@ public class PMWindow extends JFrame {
 		
 	public void changeBtn() 
 	{
-		tfFirstname.getDocument().addDocumentListener(new DocumentListener() 
-		{
-
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
+		listeners.putIfAbsent(tfFirstname, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfLastname, new MyDocumentListener(this));
+		
+		
+		tfFirstname.getDocument().addDocumentListener(listeners.get(tfFirstname));
+	//	tfLastname.getDocument().addDocumentListener(listeners.get(tfLastname));
+		
+		
+//		tfFirstname.getDocument().addDocumentListener(new DocumentListener() 
+//		{
+//			boolean firstRun =true;
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(firstRun) {
+//					btnDelete.setEnabled(true);
+//					btnSave.setEnabled(false);
+//					btnCancel.setEnabled(false);
+//					isMouseEventEnabled = false;
+//					firstRun = false;
+//				}
+//				else {
+//					isUserInsert = true;
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					btnDelete.setEnabled(false);
+//				}
+//				
+////				if(!isUserInsert) 
+////				{
+////					btnDelete.setEnabled(false);
+////					btnSave.setEnabled(true);
+////					btnCancel.setEnabled(true);
+////					isMouseEventEnabled = false;					
+////				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				if(!isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+////				btnDelete.setEnabled(true);
+////				btnSave.setEnabled(false);
+////				btnCancel.setEnabled(false);
+////				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
 //				btnDelete.setEnabled(true);
 //				btnSave.setEnabled(false);
 //				btnCancel.setEnabled(false);
-//				tablePerson.setRowSelectionAllowed(true);
 //				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);
-				tablePerson.setRowSelectionAllowed(true);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfLastname.getDocument().addDocumentListener(new DocumentListener()
-
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfEmail.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfPhone.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfFax.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);	
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfUsername.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfPassword.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfAcronym.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfTitle.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);	
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfStartdate.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);	
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		tfEnddate.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		taDescription.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
-		taCollabs.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				if(isUserInsert) 
-				{
-					btnDelete.setEnabled(false);
-					btnSave.setEnabled(true);
-					btnCancel.setEnabled(true);
-					isMouseEventEnabled = false;					
-				}
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				isMouseEventEnabled = true;
-				
-			}
-		});
+//				
+//			}
+//		});
+		
+		
+//		tfLastname.getDocument().addDocumentListener(new DocumentListener()
+//
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfEmail.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfPhone.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfFax.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);	
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfUsername.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfPassword.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfAcronym.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfTitle.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);	
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfStartdate.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);	
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		tfEnddate.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		taDescription.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
+//		taCollabs.getDocument().addDocumentListener(new DocumentListener()
+//		{
+//			@Override
+//			public void insertUpdate(DocumentEvent e) 
+//			{
+//				if(isUserInsert) 
+//				{
+//					btnDelete.setEnabled(false);
+//					btnSave.setEnabled(true);
+//					btnCancel.setEnabled(true);
+//					isMouseEventEnabled = false;					
+//				}
+//			}
+//
+//			@Override
+//			public void removeUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//			}
+//
+//			@Override
+//			public void changedUpdate(DocumentEvent e) 
+//			{
+//				btnDelete.setEnabled(true);
+//				btnSave.setEnabled(false);
+//				btnCancel.setEnabled(false);
+//				isMouseEventEnabled = true;
+//				
+//			}
+//		});
 	}
 	
 	//empties the form fields
 	public void resetFields() 
 	{
+		isMouseEventEnabled=true;
 		for(JTextField tf : tfList)
 		 {
+			
 			 tf.setText("");
+			 
+			 MyDocumentListener tmp = listeners.get(tf);
+			 if(tmp != null) {
+				 tmp.firstRun = true;
+				 
+				 //tf.getDocument().removeDocumentListener(tmp);
+				//listeners.remove(tf);
+				 
+			 }
+			 
 		 }
+		// listeners.clear();
 		 cbSex.setSelectedIndex(0);
 		 taCollabs.setText("");
 		 taDescription.setText("");
 	}
 	
 	public void changeButtonState( boolean isUserInput) {
-		btnSave.setEnabled(!isUserInput);
-		btnCancel.setEnabled(!isUserInput);
+		btnSave.setEnabled(isUserInput);
+		btnCancel.setEnabled(isUserInput);
 	}
 	
 	public void setUserInput( boolean active) {
 		this.isUserInsert = active;
-		changeButtonState(active);
+		//changeButtonState(active);
 	}
+	
+	
+class MyDocumentListener implements DocumentListener {
+		
+		boolean firstRun =true;
+		PMWindow pmWindow;
+	
+		
+		public MyDocumentListener(PMWindow pmWindow) {
+			this.pmWindow = pmWindow;
+		}
+		
+		@Override
+		public void insertUpdate(DocumentEvent e) 
+		{
+			if(firstRun) {
+				pmWindow.btnDelete.setEnabled(true);
+				pmWindow.btnSave.setEnabled(false);
+				pmWindow.btnCancel.setEnabled(false);
+				pmWindow.isMouseEventEnabled = false;
+				firstRun = false;
+			}
+			else {
+				pmWindow.isUserInsert = true;
+				pmWindow.btnSave.setEnabled(true);
+				pmWindow.btnCancel.setEnabled(true);
+				pmWindow.btnDelete.setEnabled(false);
+			}
+			
+//			if(!isUserInsert) 
+//			{
+//				btnDelete.setEnabled(false);
+//				btnSave.setEnabled(true);
+//				btnCancel.setEnabled(true);
+//				isMouseEventEnabled = false;					
+//			}
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) 
+		{
+//			if(!pmWindow.isUserInsert) 
+//			{
+//				pmWindow.btnDelete.setEnabled(false);
+//				pmWindow.btnSave.setEnabled(true);
+//				pmWindow.btnCancel.setEnabled(true);
+//				pmWindow.isMouseEventEnabled = false;					
+//			}
+			
+			
+//			btnDelete.setEnabled(true);
+//			btnSave.setEnabled(false);
+//			btnCancel.setEnabled(false);
+//			isMouseEventEnabled = true;
+		}
+
+		@Override
+		public void changedUpdate(DocumentEvent e) 
+		{
+//			pmWindow.btnDelete.setEnabled(true);
+//			pmWindow.btnSave.setEnabled(false);
+//			pmWindow.btnCancel.setEnabled(false);
+//			pmWindow.isMouseEventEnabled = true;
+			
+		}
+		
+		public void setFirstRun( boolean firstrun) {
+			this.firstRun = firstrun;
+		}
+	}		
+	
+	
 }
 
 //class for the functionality of the combobox
@@ -1327,3 +1451,6 @@ class DialogModel extends DefaultComboBoxModel<Object>
 		}
 	}
 }
+
+
+
