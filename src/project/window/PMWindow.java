@@ -6,6 +6,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import java.awt.Dimension;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -14,10 +17,12 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
@@ -25,12 +30,17 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import project.PMDatabase;
+import project.PasswordHash;
+
 import java.awt.Color;
 import javax.swing.JTable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -107,6 +117,10 @@ public class PMWindow extends JFrame {
 	private int projectID;
 	private int personID;
 	private JButton btnAddCollab;
+	private boolean isMouseEventEnabled = true;
+	private boolean isUserInsert;
+	
+	HashMap<JComponent, MyDocumentListener> listeners = new HashMap<>();
 
 
 	/**
@@ -481,7 +495,7 @@ public class PMWindow extends JFrame {
 		);
 		
 		//setup for the two tables
-		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username"};
+		personHeaders = new String[]{"ID", "Firstname", "Lastname", "Gender", "E-Mail", "Phone", "Fax", "Username", "Password"};
 		numPersonRows = 0;
 		modelPerson = new DefaultTableModel(numPersonRows, personHeaders.length) 
 		{
@@ -521,48 +535,73 @@ public class PMWindow extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) 
 			{
-				int row = tablePerson.rowAtPoint(e.getPoint());
-				int col = tablePerson.columnAtPoint(e.getPoint());
-				if(isFirstTable) 
+				if(isMouseEventEnabled) 
 				{
-					if(row >= 0 && col >= 0) 
+					resetInputs();
+					//setUserInput(false);
+					isUserInsert = false;
+					
+					//changeButtonState(isUserInsert);
+					int row = tablePerson.rowAtPoint(e.getPoint());
+					int col = tablePerson.columnAtPoint(e.getPoint());
+					if(isFirstTable) 
 					{
-						personID = (int) tablePerson.getValueAt(row, 0);
-						firstname = tablePerson.getValueAt(row, 1).toString();
-						lastname = tablePerson.getValueAt(row, 2).toString();
-						sex = tablePerson.getValueAt(row, 3);
-						email = tablePerson.getValueAt(row, 4).toString();
-						phone = tablePerson.getValueAt(row, 5).toString();
-						fax = tablePerson.getValueAt(row, 6).toString();
-						username = tablePerson.getValueAt(row, 7).toString();						
-						
-						tfFirstname.setText(firstname);
-						tfLastname.setText(lastname);
-						cbSex.setSelectedItem(sex);
-						tfEmail.setText(email);
-						tfPhone.setText(phone);
-						tfFax.setText(fax);
-						tfUsername.setText(username);
+						if(row >= 0 && col >= 0) 
+						{
+							personID = (int) tablePerson.getValueAt(row, 0);
+							firstname = tablePerson.getValueAt(row, 1).toString();
+							lastname = tablePerson.getValueAt(row, 2).toString();
+							sex = tablePerson.getValueAt(row, 3);
+							email = tablePerson.getValueAt(row, 4).toString();
+							phone = tablePerson.getValueAt(row, 5).toString();
+							fax = tablePerson.getValueAt(row, 6).toString();
+							username = tablePerson.getValueAt(row, 7).toString();
+							password = (String) tablePerson.getValueAt(row, 8);
+							
+							tfFirstname.setText(firstname);
+							tfLastname.setText(lastname);
+							cbSex.setSelectedItem(sex);
+							tfEmail.setText(email);
+							tfPhone.setText(phone);
+							tfFax.setText(fax);
+							tfUsername.setText(username);
+							
+							if(password==null) {
+								tfPassword.setText("...");
+								MyDocumentListener tmp = listeners.get(tfPassword);
+								 if(tmp != null) {
+									 tmp.firstRun = true;
+								 }
+								 tfPassword.setText("");
+								 tmp.firstRun = false;
+							}
+							
+							else {
+								
+								tfPassword.setText(password);
+							}
+							
+						}
 					}
-				}
-				else if(!isFirstTable) 
-				{
-					if(row >= 0 && col >= 0) 
+					else if(!isFirstTable) 
 					{
-						projectID = (int) tablePerson.getValueAt(row, 0);
-						acronym = tablePerson.getValueAt(row, 1).toString();
-						title = tablePerson.getValueAt(row, 2).toString();
-						startdate = tablePerson.getValueAt(row, 3).toString();
-						enddate = tablePerson.getValueAt(row, 4).toString();
-						description = tablePerson.getValueAt(row, 5).toString();
-						collaborators = tablePerson.getValueAt(row, 6).toString();
-						
-						tfAcronym.setText(acronym);
-						tfTitle.setText(title);
-						tfStartdate.setText(startdate);
-						tfEnddate.setText(enddate);
-						taDescription.setText(description);
-						taCollabs.setText(collaborators);
+						if(row >= 0 && col >= 0) 
+						{
+							projectID = (int) tablePerson.getValueAt(row, 0);
+							acronym = tablePerson.getValueAt(row, 1).toString();
+							title = tablePerson.getValueAt(row, 2).toString();
+							startdate = tablePerson.getValueAt(row, 3).toString();
+							enddate = tablePerson.getValueAt(row, 4).toString();
+							description = tablePerson.getValueAt(row, 5).toString();
+							collaborators = tablePerson.getValueAt(row, 6).toString();
+							
+							tfAcronym.setText(acronym);
+							tfTitle.setText(title);
+							tfStartdate.setText(startdate);
+							tfEnddate.setText(enddate);
+							taDescription.setText(description);
+							taCollabs.setText(collaborators);
+						}
 					}
 				}
 			}
@@ -583,19 +622,20 @@ public class PMWindow extends JFrame {
 				try {  
 					
 					PreparedStatement pstmt;
+					String firstname = tfFirstname.getText();
+					String lastname = tfLastname.getText();
+					String gender = (String) cbSex.getSelectedItem();
+					String email = tfEmail.getText();
+					String phone = tfPhone.getText();
+					String fax = tfFax.getText();
+					String username = tfUsername.getText();
+					String password = PasswordHash.generatePassword(tfPassword.getText());
 				
-					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
+					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
 					{
 						
 							
-						String firstname = tfFirstname.getText();
-						String lastname = tfLastname.getText();
-						String gender = (String) cbSex.getSelectedItem();
-						String email = tfEmail.getText();
-						String phone = tfPhone.getText();
-						String fax = tfFax.getText();
-						String username = tfUsername.getText();
-						String password = tfPassword.getText();
+						
 						pstmt = conn.prepareStatement("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) "
 										+ "VALUES (?,?,?,?,?,?,?,?)");
 						pstmt.setString(1, firstname);
@@ -652,8 +692,12 @@ public class PMWindow extends JFrame {
 				 if(returnValue == JOptionPane.YES_OPTION) 
 				 {
 					 resetFields();	 
-					 
-				 }			
+					 btnDelete.setEnabled(true);
+					 btnSave.setEnabled(false);
+					 btnCancel.setEnabled(false);
+					 isMouseEventEnabled = true;
+					 isUserInsert = false;
+				 }
 			}
 		});
 		
@@ -673,7 +717,7 @@ public class PMWindow extends JFrame {
 						String phone = tfPhone.getText();
 						String fax = tfFax.getText();
 						String username = tfUsername.getText();
-						String password = tfPassword.getText();
+						String password = PasswordHash.generatePassword(tfPassword.getText());
 						
 						PreparedStatement pstmtUpdate = conn.prepareStatement("UPDATE Person SET firstname = ?, lastname = ?, sex = ?, email = ?, phone = ?, fax = ?, username = ?, password = ? WHERE personID = ?");
 						
@@ -821,411 +865,133 @@ public class PMWindow extends JFrame {
 		
 	public void changeBtn() 
 	{
-		tfFirstname.getDocument().addDocumentListener(new DocumentListener() 
-		{
-
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfLastname.getDocument().addDocumentListener(new DocumentListener()
-
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfEmail.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfPhone.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfFax.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);	
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfUsername.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfPassword.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfAcronym.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfTitle.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);	
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfStartdate.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);	
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		tfEnddate.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		taDescription.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
-		taCollabs.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(false);
-				btnSave.setEnabled(true);
-				btnCancel.setEnabled(true);	
-				tablePerson.setRowSelectionAllowed(false);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) 
-			{
-				btnDelete.setEnabled(true);
-				btnSave.setEnabled(false);
-				btnCancel.setEnabled(false);
-				tablePerson.setRowSelectionAllowed(true);
-				
-			}
-		});
+		listeners.putIfAbsent(tfFirstname, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfLastname, new MyDocumentListener(this));		
+		listeners.putIfAbsent(tfEmail, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfPhone, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfFax, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfUsername, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfPassword, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfAcronym, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfTitle, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfStartdate, new MyDocumentListener(this));
+		listeners.putIfAbsent(tfEnddate, new MyDocumentListener(this));
+		listeners.putIfAbsent(taDescription, new MyDocumentListener(this));
+		listeners.putIfAbsent(taCollabs, new MyDocumentListener(this));
+		
+		tfFirstname.getDocument().addDocumentListener(listeners.get(tfFirstname));
+		tfLastname.getDocument().addDocumentListener(listeners.get(tfLastname));
+		tfEmail.getDocument().addDocumentListener(listeners.get(tfEmail));
+		tfPhone.getDocument().addDocumentListener(listeners.get(tfPhone));
+		tfFax.getDocument().addDocumentListener(listeners.get(tfFax));
+		tfUsername.getDocument().addDocumentListener(listeners.get(tfUsername));	
+		
+		tfPassword.getDocument().addDocumentListener(listeners.get(tfPassword));		
+		
+		tfAcronym.getDocument().addDocumentListener(listeners.get(tfAcronym));
+		tfTitle.getDocument().addDocumentListener(listeners.get(tfTitle));
+		tfStartdate.getDocument().addDocumentListener(listeners.get(tfStartdate));
+		tfEnddate.getDocument().addDocumentListener(listeners.get(tfEnddate));
+		taDescription.getDocument().addDocumentListener(listeners.get(taDescription));
+		taCollabs.getDocument().addDocumentListener(listeners.get(taCollabs));
+	}
+	
+	public void resetInputs() {
+		for(JTextField tf : tfList)
+		 {
+			
+			 MyDocumentListener tmp = listeners.get(tf);
+			 if(tmp != null) {
+				 tmp.firstRun = true;
+			 }
+			 
+		 }		
 	}
 	
 	//empties the form fields
 	public void resetFields() 
 	{
+		
+		
 		for(JTextField tf : tfList)
 		 {
+			
 			 tf.setText("");
+			 
+			 resetInputs();
+			 
 		 }
+		// listeners.clear();
 		 cbSex.setSelectedIndex(0);
 		 taCollabs.setText("");
 		 taDescription.setText("");
+		 
+		isMouseEventEnabled=true;
+
 	}
+	
+	public void changeButtonState( boolean isUserInput) {
+		btnSave.setEnabled(isUserInput);
+		btnCancel.setEnabled(isUserInput);
+	}
+	
+	public void setUserInput( boolean active) {
+		this.isUserInsert = active;
+		//changeButtonState(active);
+	}
+	
+//courtesy of Sven	
+class MyDocumentListener implements DocumentListener {
+		
+		boolean firstRun =true;
+		PMWindow pmWindow;
+	
+		
+		public MyDocumentListener(PMWindow pmWindow) {
+			this.pmWindow = pmWindow;
+		}
+		
+		@Override
+		public void insertUpdate(DocumentEvent e) 
+		{
+			int dlength =  e.getDocument().getLength();
+			if(firstRun ) {
+				pmWindow.btnDelete.setEnabled(true);
+				pmWindow.btnSave.setEnabled(false);
+				pmWindow.btnCancel.setEnabled(false);
+				
+				firstRun = false;
+			}
+			else {
+				pmWindow.isMouseEventEnabled = false;
+				pmWindow.isUserInsert = true;
+				pmWindow.btnSave.setEnabled(true);
+				pmWindow.btnCancel.setEnabled(true);
+				pmWindow.btnDelete.setEnabled(false);
+			}
+			
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) 
+		{
+			if(!firstRun) {
+				insertUpdate(e);	
+			}
+		}
+
+		@Override
+		public void changedUpdate(DocumentEvent e) 
+		{
+		
+		}
+		
+		public void setFirstRun( boolean firstrun) {
+			this.firstRun = firstrun;
+		}
+	}		
+	
+	
 }
 
 //class for the functionality of the combobox
@@ -1256,3 +1022,6 @@ class DialogModel extends DefaultComboBoxModel<Object>
 		}
 	}
 }
+
+
+
