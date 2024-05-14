@@ -619,22 +619,22 @@ public class PMWindow extends JFrame {
 		{
 			public void actionPerformed(ActionEvent e) 
 			{					
-				try {  
+				String acronym = tfAcronym.getText();
+				String title = tfTitle.getText();
+				String startdate = tfStartdate.getText();
+				String endDate = tfEnddate.getText();
+				String description = taDescription.getText();
+				String firstname = tfFirstname.getText();
+				String lastname = tfLastname.getText();
+				String gender = (String) cbSex.getSelectedItem();
+				String email = tfEmail.getText();
+				String phone = tfPhone.getText();
+				String fax = tfFax.getText();
+				String username = tfUsername.getText();
+				String password = PasswordHash.generatePassword(tfPassword.getText());
 				
-					String firstname = tfFirstname.getText();
-					String lastname = tfLastname.getText();
-					String gender = (String) cbSex.getSelectedItem();
-					String email = tfEmail.getText();
-					String phone = tfPhone.getText();
-					String fax = tfFax.getText();
-					String username = tfUsername.getText();
-					String password = PasswordHash.generatePassword(tfPassword.getText());
-					
-					String acronym = tfAcronym.getText();
-					String title = tfTitle.getText();
-					String startdate = tfStartdate.getText();
-					String endDate = tfEnddate.getText();
-					String description = taDescription.getText();
+				
+				try {  
 				
 					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
 					{
@@ -684,56 +684,34 @@ public class PMWindow extends JFrame {
 			{
 				try 
 				{
+					String firstname = tfFirstname.getText();
+					String lastname = tfLastname.getText();
+					String gender = (String) cbSex.getSelectedItem();
+					String email = tfEmail.getText();
+					String phone = tfPhone.getText();
+					String fax = tfFax.getText();
+					String username = tfUsername.getText();
+					String password = PasswordHash.generatePassword(tfPassword.getText());
+					
+					String acronym = tfAcronym.getText();
+					String title = tfTitle.getText();
+					String startdate = tfStartdate.getText();
+					String endDate = tfEnddate.getText();
+					String description = taDescription.getText();
+					
 					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
 					{
-						String firstname = tfFirstname.getText();
-						String lastname = tfLastname.getText();
-						String gender = (String) cbSex.getSelectedItem();
-						String email = tfEmail.getText();
-						String phone = tfPhone.getText();
-						String fax = tfFax.getText();
-						String username = tfUsername.getText();
-						String password = PasswordHash.generatePassword(tfPassword.getText());
 						
-						PreparedStatement pstmtUpdate = conn.prepareStatement("UPDATE Person SET firstname = ?, lastname = ?, sex = ?, email = ?, phone = ?, fax = ?, username = ?, password = ? WHERE personID = ?");
-						
-						pstmtUpdate.setString(1, firstname);
-						pstmtUpdate.setString(2, lastname);
-						pstmtUpdate.setString(3, gender);
-						pstmtUpdate.setString(4, email);
-						pstmtUpdate.setString(5, phone);
-						pstmtUpdate.setString(6, fax);
-						pstmtUpdate.setString(7, username);
-						pstmtUpdate.setString(8, password);
-						pstmtUpdate.setInt(9, personID);
-						pstmtUpdate.executeUpdate();
-						pstmtUpdate.close();
-						
+						PMDatabase.updatePerson(firstname, lastname, username, email, phone, fax, username, password, personID);						
 						PMDatabase.fetchFromPerson(modelPerson);						
 					}
 					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty())
 					{
-						String acronym = tfAcronym.getText();
-						String title = tfTitle.getText();
-						String startdate = tfStartdate.getText();
-						String endDate = tfEnddate.getText();
-						String description = taDescription.getText();
-						PreparedStatement pstmt = conn.prepareStatement("UPDATE Project SET acronym = ?, title = ?, startdate = ?, enddate = ?, description = ? WHERE projectID = ?");
-						pstmt.setString(1, acronym);
-						pstmt.setString(2, title);
-						pstmt.setString(3, startdate);
-						pstmt.setString(4,  endDate);
-						pstmt.setString(5, description);
-						pstmt.setInt(6, projectID);
-						pstmt.executeUpdate();
-						pstmt.close();
-						
+						PMDatabase.updateProject(acronym, title, startdate, endDate, description, projectID);
 						PMDatabase.fetchFromProjects(modelProject);						
 					}
-					
-					conn.close();
 				} 
-				catch (SQLException e1) 
+				catch (NullPointerException e1) 
 				{
 					e1.printStackTrace();
 				}

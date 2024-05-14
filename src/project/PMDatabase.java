@@ -14,8 +14,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class PMDatabase 
 {
-	private static PreparedStatement stmt;
-	
+	private static PreparedStatement stmt;	
 	private static Connection conn;
 	
 	/**
@@ -210,6 +209,53 @@ public class PMDatabase
 		closeConn();
 		
 	} 
+	public static void updatePerson(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, int pID)
+	{
+		connect();
+		
+		try 
+		{
+			stmt = conn.prepareStatement("UPDATE Person SET firstname = ?, lastname = ?, sex = ?, email = ?, phone = ?, fax = ?, username = ?, password = ? WHERE personID = ?");
+			stmt.setString(1, fname);
+			stmt.setString(2, lname);
+			stmt.setString(3, sex);
+			stmt.setString(4, email);
+			stmt.setString(5, phone);
+			stmt.setString(6, fax);
+			stmt.setString(7, user);
+			stmt.setString(8, pw);
+			stmt.setInt(9, pID);
+			stmt.executeUpdate();
+			
+			closeConn();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	public static void updateProject(String acr, String title, String start, String end, String desc, int pID) 
+	{
+		try 
+		{
+			stmt = conn.prepareStatement("UPDATE Project SET acronym = ?, title = ?, startdate = ?, enddate = ?, description = ? WHERE projectOD = ?");
+			stmt.setString(1, acr);
+			stmt.setString(2, title);
+			stmt.setString(3, start);
+			stmt.setString(4, end);
+			stmt.setString(5, desc);
+			stmt.setInt(6, pID);
+			stmt.executeUpdate();
+			
+			closeConn();
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
 	/**
      * Closes the database connection.
      */
