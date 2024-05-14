@@ -620,8 +620,7 @@ public class PMWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) 
 			{					
 				try {  
-					
-					PreparedStatement pstmt;
+				
 					String firstname = tfFirstname.getText();
 					String lastname = tfLastname.getText();
 					String gender = (String) cbSex.getSelectedItem();
@@ -630,52 +629,29 @@ public class PMWindow extends JFrame {
 					String fax = tfFax.getText();
 					String username = tfUsername.getText();
 					String password = PasswordHash.generatePassword(tfPassword.getText());
+					
+					String acronym = tfAcronym.getText();
+					String title = tfTitle.getText();
+					String startdate = tfStartdate.getText();
+					String endDate = tfEnddate.getText();
+					String description = taDescription.getText();
 				
 					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
 					{
 						
-							
-						
-						pstmt = conn.prepareStatement("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) "
-										+ "VALUES (?,?,?,?,?,?,?,?)");
-						pstmt.setString(1, firstname);
-						pstmt.setString(2, lastname);
-						pstmt.setString(3, gender);
-						pstmt.setString(4, email);
-						pstmt.setString(5,  phone);
-						pstmt.setString(6, fax);
-						pstmt.setString(7, username);
-						pstmt.setString(8, password);
-						pstmt.execute();
-						pstmt.close();
-						
+						PMDatabase.insertIntoPerson(firstname, lastname, gender, email, phone, fax, username, password);						
 						PMDatabase.fetchFromPerson(modelPerson);
 					} 
-					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty()) 
+					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
 					{
-						
-						String acronym = tfAcronym.getText();
-						String title = tfTitle.getText();
-						String startdate = tfStartdate.getText();
-						String endDate = tfEnddate.getText();
-						String description = taDescription.getText();
-						pstmt = conn.prepareStatement("INSERT INTO Project (acronym, title, startdate, enddate, description) VALUES (?,?,?,?,?)");
-						pstmt.setString(1, acronym);
-						pstmt.setString(2, title);
-						pstmt.setString(3, startdate);
-						pstmt.setString(4,  endDate);
-						pstmt.setString(5, description);
-						pstmt.execute();
-						pstmt.close();
-						
+						PMDatabase.insertIntoProject(acronym, title, startdate, endDate, description);						
 						PMDatabase.fetchFromProjects(modelProject);
 
 					}
 					tablePerson.repaint();
-					conn.close();
 					resetFields();
 					} 
-				catch (SQLException e1) 
+				catch (NullPointerException e1) 
 				{
 					e1.printStackTrace();
 				}
