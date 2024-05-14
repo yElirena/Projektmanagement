@@ -14,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class PMDatabase 
 {
+	private static PreparedStatement stmt;
 	
 	private static Connection conn;
 	
@@ -73,14 +74,14 @@ public class PMDatabase
      * 
      * @param modelPerson the DefaultTableModel to populate with data from the Person table
      */
-	public static void fetchFromPerson(DefaultTableModel modelPerson) 
+	public static void fetchFromPerson(DefaultTableModel model) 
 	{
 		connect();
 		
 		try 
 		{
-			modelPerson.setRowCount(0);
-			PreparedStatement pStmt = conn.prepareStatement("SELECT personID, firstname, lastname, sex, email, phone, fax, username, password FROM Person");
+			model.setRowCount(0);
+			PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM Person");
 			ResultSet rs = pStmt.executeQuery();
 			while(rs.next()) {
 				Object[] row = {
@@ -94,11 +95,11 @@ public class PMDatabase
 						rs.getString("username"),
 						rs.getString("password")
 				};
-				modelPerson.addRow(row);
+				model.addRow(row);
 			}
 			rs.close();
 			pStmt.close();
-			conn.close();
+			closeConn();
 		} 
 		catch (SQLException e) 
 		{
@@ -119,7 +120,7 @@ public class PMDatabase
 		try 
 		{
 			modelProject.setRowCount(0);
-			PreparedStatement pStmt = conn.prepareStatement("SELECT projectID, acronym, title, startdate, enddate, description FROM Project");
+			PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM Project");
 			ResultSet rs = pStmt.executeQuery();
 			while(rs.next()) 
 			{
@@ -158,7 +159,7 @@ public class PMDatabase
 			}
 			rs.close();
 			pStmt.close();
-			conn.close();
+			closeConn();
 		} 
 		catch (SQLException e) 
 		{
@@ -166,13 +167,61 @@ public class PMDatabase
 		}		
 	}
 	
-	  /**
+	public static void insertIntoPerson(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw) 
+	{
+		connect();
+		
+		try 
+		{
+			stmt = conn.prepareStatement("INSERT INTO Person (firstname, lastname, sex, email, phone, fax, username, password) VALUES (?,?,?,?,?,?,?,?)");
+			stmt.setString(1, fname);
+			stmt.setString(2, lname);
+			stmt.setString(3, sex);
+			stmt.setString(4, email);
+			stmt.setString(5, phone);
+			stmt.setString(6, fax);
+			stmt.setString(7, user);
+			stmt.setString(8, pw);
+			stmt.execute();
+			
+		} catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}		
+		closeConn();
+	}
+	public static void insertIntoProject(String acr, String title, String start, String end, String desc) 
+	{
+		connect();
+		try 
+		{
+			stmt = conn.prepareStatement("INSERT INTO Project (acronym, title, startdate, enddate, description) VALUES (?,?,?,?,?)");
+			stmt.setString(1, acr);
+			stmt.setString(2, title);
+			stmt.setString(3, start);
+			stmt.setString(4,  end);
+			stmt.setString(5, desc);
+			stmt.execute();
+			stmt.close();
+		} catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		closeConn();
+		
+	} 
+	/**
      * Closes the database connection.
      */
 	public static void closeConn() 
 	{
 		try 
 		{
+			if(stmt != null) 
+			{
+				stmt.close();
+				
+			}
 			conn.close();
 		} catch (SQLException e) 
 		{
