@@ -816,7 +816,7 @@ public class PMWindow extends JFrame {
 		});
 	}
 	
-		
+	//courtesy of Sven	
 	public void changeBtn() 
 	{
 		listeners.putIfAbsent(tfFirstname, new MyDocumentListener(this));
@@ -849,7 +849,7 @@ public class PMWindow extends JFrame {
 		taDescription.getDocument().addDocumentListener(listeners.get(taDescription));
 		taCollabs.getDocument().addDocumentListener(listeners.get(taCollabs));
 	}
-	
+	//courtesy of Sven	
 	public void resetInputs() {
 		for(JTextField tf : tfList)
 		 {
@@ -884,11 +884,13 @@ public class PMWindow extends JFrame {
 
 	}
 	
+	//courtesy of Sven	
 	public void changeButtonState( boolean isUserInput) {
 		btnSave.setEnabled(isUserInput);
 		btnCancel.setEnabled(isUserInput);
 	}
 	
+	//courtesy of Sven	
 	public void setUserInput( boolean active) {
 		this.isUserInsert = active;
 		//changeButtonState(active);
