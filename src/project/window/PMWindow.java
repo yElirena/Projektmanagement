@@ -1,14 +1,10 @@
 package project.window;
 
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import java.awt.Dimension;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -29,8 +25,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
-import project.PMDatabase;
-import project.PasswordHash;
+
+import project.database.PMDatabase;
+import project.database.PasswordHash;
 
 import java.awt.Color;
 import javax.swing.JTable;
@@ -38,12 +35,8 @@ import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import javax.swing.border.BevelBorder;
@@ -699,13 +692,13 @@ public class PMWindow extends JFrame {
 					String description = taDescription.getText();
 					String collabs = taCollabs.getText();
 					
-					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
+					if(arePersonFieldsFilled()) 
 					{
 						
-						PMDatabase.updatePerson(firstname, lastname, username, email, phone, fax, username, password, personID);						
+						PMDatabase.updatePerson(firstname, lastname, gender, email, phone, fax, username, password, personID);						
 						PMDatabase.fetchFromPerson(modelPerson);						
 					}
-					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty())
+					else if(areProjectFieldsFilled())
 					{
 						PMDatabase.updateProject(acronym, title, startdate, endDate, description, collabs, projectID);
 						PMDatabase.fetchFromProjects(modelProject);						
@@ -854,6 +847,25 @@ public class PMWindow extends JFrame {
 	public void setUserInput( boolean active) {
 		this.isUserInsert = active;
 		//changeButtonState(active);
+	}
+	
+	public boolean arePersonFieldsFilled() 
+	{
+		return !tfFirstname.getText().isEmpty() && 
+				!tfLastname.getText().isEmpty() && 
+				!tfEmail.getText().isEmpty() && 
+				!tfPhone.getText().isEmpty() && 
+				!tfUsername.getText().isEmpty() && 
+				!tfPassword.getText().isEmpty();
+		
+	}
+	
+	public boolean areProjectFieldsFilled() 
+	{
+		return !tfAcronym.getText().isEmpty() && 
+				!tfTitle.getText().isEmpty() && 
+				!tfStartdate.getText().isEmpty() && 
+				!taDescription.getText().isEmpty();
 	}
 	
 //courtesy of Sven	
