@@ -1,4 +1,4 @@
-package project;
+package project.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +17,7 @@ public class PMDatabase
 {
 	private static PreparedStatement stmt;	
 	private static Connection conn;
+	private static int ppID;
 	
 	/**
      * Establishes a connection to the SQLite database.
@@ -279,6 +280,7 @@ public class PMDatabase
 			e.getMessage();
 		}
 	}
+	
 	public static void updatePerson(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, int pID)
 	{
 		connect();
@@ -384,6 +386,31 @@ public class PMDatabase
 	        }
 		}
 		
+	}
+	public static void updateAll(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, int personID, String acr, String title, String start, String end, String desc, String collabs, int pID, int ppID) 
+	{
+		Thread dPerson = new Thread(() -> 
+		{
+			updatePerson(fname, lname, sex, email, phone, fax, user, pw, pID);
+		});
+		Thread dProject = new Thread(() -> 
+		{
+			updateProject(acr, title, start, end, desc, collabs, pID);
+		});
+		
+		dPerson.start();
+		dProject.start();
+		
+		try 
+		{
+			dPerson.join();
+			dProject.join();
+		}
+		catch(InterruptedException e) 
+		{
+			e.printStackTrace();
+			e.getMessage();
+		}
 	}
 	
 	/**
