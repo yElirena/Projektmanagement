@@ -70,7 +70,7 @@ public class PMWindow extends JFrame {
 	private JLabel lblPassword;
 	private JTextField tfPassword;
 	private JLabel lblCollaborators;
-	private JButton btnUpdate;
+	private JButton btnSave;
 	private JButton btnDelete;
 	private JLabel lblProject;
 	private JLabel lblAcronym;
@@ -85,7 +85,7 @@ public class PMWindow extends JFrame {
 	private JTextField tfFirstname;
 	private JTextField tfFax;
 	private JTextField tfLastname;
-	private JButton btnSave;
+	private JButton btnNew;
 	private List<JTextField> tfList = new ArrayList<JTextField>();
 	private JScrollPane scpDescription;
 	private JScrollPane scpCollab;
@@ -116,7 +116,6 @@ public class PMWindow extends JFrame {
 	private String collaborators;
 	private int projectID;
 	private int personID;
-	private JButton btnAddCollab;
 	private boolean isMouseEventEnabled = true;
 	private boolean isUserInsert;
 	
@@ -290,18 +289,14 @@ public class PMWindow extends JFrame {
 		btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnCancel.setEnabled(false);
 		
-		btnSave = new JButton("Save");
-		btnSave.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
-		btnSave.setFont(new Font("Times New Roman", Font.BOLD, 12));
-		btnSave.setEnabled(false);
+		btnNew = new JButton("New");
+		btnNew.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
+		btnNew.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btnNew.setEnabled(false);
 		
 		scpCollab = new JScrollPane();
 		
 		scpDescription = new JScrollPane();
-		
-		btnAddCollab = new JButton("Add Collaborators");
-		btnAddCollab.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
-		btnAddCollab.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		GroupLayout gl_topPanel = new GroupLayout(topPanel);
 		gl_topPanel.setHorizontalGroup(
 			gl_topPanel.createParallelGroup(Alignment.LEADING)
@@ -338,8 +333,8 @@ public class PMWindow extends JFrame {
 								.addComponent(tfPhone, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
 								.addComponent(tfLastname, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
 								.addComponent(tfEmail, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)))
-						.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE))
-					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(btnNew, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_topPanel.createSequentialGroup()
 							.addGap(60)
 							.addGroup(gl_topPanel.createParallelGroup(Alignment.LEADING)
@@ -366,10 +361,7 @@ public class PMWindow extends JFrame {
 							.addContainerGap())
 						.addGroup(gl_topPanel.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(btnAddCollab)
-							.addGap(78))))
+							.addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE))))
 		);
 		gl_topPanel.setVerticalGroup(
 			gl_topPanel.createParallelGroup(Alignment.TRAILING)
@@ -431,8 +423,7 @@ public class PMWindow extends JFrame {
 					.addGap(41)
 					.addGroup(gl_topPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnCancel)
-						.addComponent(btnAddCollab)
-						.addComponent(btnSave))
+						.addComponent(btnNew))
 					.addGap(23))
 		);
 		
@@ -451,9 +442,9 @@ public class PMWindow extends JFrame {
 		bottomPanel.setMaximumSize(new Dimension(32767, 16383));
 		splitPane.setRightComponent(bottomPanel);
 		
-		btnUpdate = new JButton("Update");
-		btnUpdate.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
-		btnUpdate.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btnSave = new JButton("Save");
+		btnSave.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
+		btnSave.setFont(new Font("Times New Roman", Font.BOLD, 12));
 		
 		btnDelete = new JButton("Delete");
 		btnDelete.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(0, 0, 0), null, null, null));
@@ -471,7 +462,7 @@ public class PMWindow extends JFrame {
 					.addGroup(gl_bottomPanel.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_bottomPanel.createSequentialGroup()
 							.addGap(289)
-							.addComponent(btnUpdate, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnDelete, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -487,7 +478,7 @@ public class PMWindow extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_bottomPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnDelete)
-						.addComponent(btnUpdate)
+						.addComponent(btnSave)
 						.addComponent(btnChangeTable))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(scpTable, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)
@@ -615,7 +606,7 @@ public class PMWindow extends JFrame {
 		Connection conn = PMDatabase.connect();
 		
 		//saving the textfields to the database
-		btnSave.addActionListener(new ActionListener() 
+		btnNew.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{					
@@ -624,6 +615,7 @@ public class PMWindow extends JFrame {
 				String startdate = tfStartdate.getText();
 				String endDate = tfEnddate.getText();
 				String description = taDescription.getText();
+				String collabs = taCollabs.getText();
 				String firstname = tfFirstname.getText();
 				String lastname = tfLastname.getText();
 				String gender = (String) cbSex.getSelectedItem();
@@ -636,18 +628,25 @@ public class PMWindow extends JFrame {
 				
 				try {  
 				
-					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
+					if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty() && !acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
 					{
-						
-						PMDatabase.insertIntoPerson(firstname, lastname, gender, email, phone, fax, username, password);						
-						PMDatabase.fetchFromPerson(modelPerson);
-					} 
+						PMDatabase.insertAll(firstname, lastname, gender, email, phone, fax, username, password, acronym, title, startdate, endDate, description);
+					}
+					else if (!collabs.isEmpty()) 
+					{
+						PMDatabase.insertIntoCollab(projectID, collabs);
+					}
 					else if(!acronym.isEmpty() && !title.isEmpty() && !startdate.isEmpty() && !description.isEmpty()) 
 					{
-						PMDatabase.insertIntoProject(acronym, title, startdate, endDate, description);						
-						PMDatabase.fetchFromProjects(modelProject);
-
+						PMDatabase.insertIntoProject(acronym, title, startdate, endDate, description);
 					}
+					else if(!firstname.isEmpty() && !lastname.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !username.isEmpty() && !password.isEmpty()) 
+					{
+						PMDatabase.insertIntoPerson(firstname, lastname, gender, email, phone, fax, username, password);			
+						
+					}
+					PMDatabase.fetchFromPerson(modelPerson);
+					PMDatabase.fetchFromProjects(modelProject);
 					tablePerson.repaint();
 					resetFields();
 					} 
@@ -669,7 +668,7 @@ public class PMWindow extends JFrame {
 				 {
 					 resetFields();	 
 					 btnDelete.setEnabled(true);
-					 btnSave.setEnabled(false);
+					 btnNew.setEnabled(false);
 					 btnCancel.setEnabled(false);
 					 isMouseEventEnabled = true;
 					 isUserInsert = false;
@@ -678,7 +677,7 @@ public class PMWindow extends JFrame {
 		});
 		
 		//updating the information in case the information was changed
-		btnUpdate.addActionListener(new ActionListener() 
+		btnSave.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
@@ -698,6 +697,7 @@ public class PMWindow extends JFrame {
 					String startdate = tfStartdate.getText();
 					String endDate = tfEnddate.getText();
 					String description = taDescription.getText();
+					String collabs = taCollabs.getText();
 					
 					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
 					{
@@ -707,51 +707,11 @@ public class PMWindow extends JFrame {
 					}
 					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty())
 					{
-						PMDatabase.updateProject(acronym, title, startdate, endDate, description, projectID);
+						PMDatabase.updateProject(acronym, title, startdate, endDate, description, collabs, projectID);
 						PMDatabase.fetchFromProjects(modelProject);						
 					}
 				} 
 				catch (NullPointerException e1) 
-				{
-					e1.printStackTrace();
-				}
-			}
-		});
-		
-		//adding collaborators to a project
-		btnAddCollab.addActionListener(new ActionListener() 
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				try 
-				{
-					String[] lastNames = taCollabs.getText().split("[,\\s\\r?\\n]+");
-					PreparedStatement pstmtInsert = conn.prepareStatement("INSERT INTO Person_Project (personID, projectID) VALUES (?,?)");
-					PreparedStatement pstmtPersonId = conn.prepareStatement("SELECT personID FROM Person WHERE lastname = ?");
-					for (String lastName : lastNames) 
-					{
-						lastName.toString();
-						pstmtPersonId.setString(1, lastName);
-						ResultSet rsPersonId = pstmtPersonId.executeQuery();
-						if(rsPersonId.next()) 
-						{
-							int personID = rsPersonId.getInt("personID");
-							pstmtInsert.setInt(1, personID);
-							pstmtInsert.setInt(2,  projectID);
-							pstmtInsert.executeUpdate();
-						}
-						else 
-						{
-							JOptionPane.showMessageDialog(null, lastname + " does not exist in the database.");
-						}
-						rsPersonId.close();
-					}
-					pstmtPersonId.close();
-					pstmtInsert.close();
-					PMDatabase.fetchFromProjects(modelProject);
-					conn.close();
-				} 
-				catch (SQLException e1) 
 				{
 					e1.printStackTrace();
 				}
@@ -886,7 +846,7 @@ public class PMWindow extends JFrame {
 	
 	//courtesy of Sven	
 	public void changeButtonState( boolean isUserInput) {
-		btnSave.setEnabled(isUserInput);
+		btnNew.setEnabled(isUserInput);
 		btnCancel.setEnabled(isUserInput);
 	}
 	
@@ -913,7 +873,7 @@ class MyDocumentListener implements DocumentListener {
 			int dlength =  e.getDocument().getLength();
 			if(firstRun ) {
 				pmWindow.btnDelete.setEnabled(true);
-				pmWindow.btnSave.setEnabled(false);
+				pmWindow.btnNew.setEnabled(false);
 				pmWindow.btnCancel.setEnabled(false);
 				
 				firstRun = false;
@@ -921,7 +881,7 @@ class MyDocumentListener implements DocumentListener {
 			else {
 				pmWindow.isMouseEventEnabled = false;
 				pmWindow.isUserInsert = true;
-				pmWindow.btnSave.setEnabled(true);
+				pmWindow.btnNew.setEnabled(true);
 				pmWindow.btnCancel.setEnabled(true);
 				pmWindow.btnDelete.setEnabled(false);
 			}

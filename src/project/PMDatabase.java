@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -57,7 +58,7 @@ public class PMDatabase
 			stmt.execute("CREATE TABLE IF NOT EXISTS Person (personID INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, sex TEXT, email TEXT, phone TEXT, fax TEXT, username TEXT, password TEXT)");
 			stmt.close();
 			
-			stmt.execute("CREATE TABLE IF NOT EXISTS Person_Project (personID INTEGER, projectID INTEGER, FOREIGN KEY(personID) REFERENCES Person(personID) ON DELETE CASCADE, FOREIGN KEY(projectID) REFERENCES Project(projectID) ON DELETE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS Person_Project (ppID INTEGER PRIMARY KEY AUTOINCREMENT, personID INTEGER, projectID INTEGER, FOREIGN KEY(personID) REFERENCES Person(personID) ON DELETE CASCADE, FOREIGN KEY(projectID) REFERENCES Project(projectID) ON DELETE CASCADE)");
 			stmt.close();
 			System.out.println("Tables have been created successfully.");
 			conn.close();
@@ -131,12 +132,13 @@ public class PMDatabase
 				String enddate = rs.getString("enddate");
 				String description =rs.getString("description");
 				
-				PreparedStatement pStmt2 = conn.prepareStatement("SELECT DISTINCT p.lastname FROM PERSON p JOIN Person_Project pp ON p.personID = pp.personID WHERE pp.projectID = ?");
+				PreparedStatement pStmt2 = conn.prepareStatement("SELECT DISTINCT p.firstname, p.lastname FROM PERSON p JOIN Person_Project pp ON p.personID = pp.personID WHERE pp.projectID = ?");
 				pStmt2.setInt(1, projectID);
 				ResultSet rsCollab = pStmt2.executeQuery();
 				StringBuilder collaborators = new StringBuilder();
 				while(rsCollab.next()) 
 				{
+					collaborators.append(rsCollab.getString("firstname")).append(" ");
 					collaborators.append(rsCollab.getString("lastname")).append(", ");
 				}
 				if(collaborators.length() > 0) 
@@ -154,6 +156,7 @@ public class PMDatabase
 					collaborators.toString()
 				};
 				
+				pStmt2.close();
 				modelProject.addRow(row);
 			}
 			rs.close();
@@ -183,7 +186,8 @@ public class PMDatabase
 			stmt.setString(8, pw);
 			stmt.execute();
 			
-		} catch (SQLException e) 
+		} 
+		catch (SQLException e) 
 		{
 			e.printStackTrace();
 		}		
@@ -201,14 +205,80 @@ public class PMDatabase
 			stmt.setString(4,  end);
 			stmt.setString(5, desc);
 			stmt.execute();
-			stmt.close();
-		} catch (SQLException e) 
+		} 
+		catch (SQLException e) 
 		{
 			e.printStackTrace();
 		}
-		closeConn();
-		
+		closeConn();		
 	} 
+	public static void insertIntoCollab(int projectID, String collabs) 
+	{
+		
+		try 
+		{
+			String[] nameArray = collabs.split("[,\\s]+");
+			PreparedStatement stmtPersonID = conn.prepareStatement("SELECT personID FROM Person WHERE firstname = ? AND lastname = ?");
+			PreparedStatement stmtInsert = conn.prepareStatement("INSERT INTO Person_Project (personID, projectID) VALUES (?,?)");
+			for (int i = 0; i < nameArray.length; i += 2) {
+                if (i + 1 >= nameArray.length) {
+                    JOptionPane.showMessageDialog(null, "Invalid name format: " + nameArray[i]);
+                    continue;
+                }
+
+                String firstname = nameArray[i];
+                String lastname = nameArray[i + 1];
+                System.out.println(firstname + " " + lastname);
+				stmtPersonID.setString(1, firstname);
+				stmtPersonID.setString(2, lastname);
+				ResultSet rsPersonId = stmtPersonID.executeQuery();
+				if(rsPersonId.next()) 
+				{
+					int personID = rsPersonId.getInt("personID");
+					stmtInsert.setInt(1, personID);
+					stmtInsert.setInt(2,  projectID);
+					stmtInsert.executeUpdate();
+				}
+				else 
+				{
+					JOptionPane.showMessageDialog(null, firstname + " " + lastname + " does not exist in the database.");
+				}
+				rsPersonId.close();
+			}
+			stmtPersonID.close();
+			stmtInsert.close();
+			closeConn();
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	public static void insertAll(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, String acr, String title, String start, String end, String desc) 
+	{
+		Thread tPerson = new Thread(() -> 
+		{
+			insertIntoPerson(fname, lname, sex, email, phone, fax, user, pw);
+		});
+		Thread tProject = new Thread(() -> 
+		{
+			insertIntoProject(acr, title, start, end, desc);
+		});
+		
+		tPerson.start();
+		tProject.start();
+		
+		try 
+		{
+			tPerson.join();
+			tProject.join();
+		}
+		catch(InterruptedException e) 
+		{
+			e.printStackTrace();
+			e.getMessage();
+		}
+	}
 	public static void updatePerson(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, int pID)
 	{
 		connect();
@@ -234,11 +304,11 @@ public class PMDatabase
 		}
 		
 	}
-	public static void updateProject(String acr, String title, String start, String end, String desc, int pID) 
+	public static void updateProject(String acr, String title, String start, String end, String desc, String collabs, int pID) 
 	{
 		try 
 		{
-			stmt = conn.prepareStatement("UPDATE Project SET acronym = ?, title = ?, startdate = ?, enddate = ?, description = ? WHERE projectOD = ?");
+			stmt = conn.prepareStatement("UPDATE Project SET acronym = ?, title = ?, startdate = ?, enddate = ?, description = ? WHERE projectID = ?");
 			stmt.setString(1, acr);
 			stmt.setString(2, title);
 			stmt.setString(3, start);
@@ -247,11 +317,71 @@ public class PMDatabase
 			stmt.setInt(6, pID);
 			stmt.executeUpdate();
 			
-			closeConn();
+			String[] nameArray = collabs.split("[,\\s]+");
+			PreparedStatement stmtPpID = conn.prepareStatement("SELECT ppID FROM Person_Project WHERE projectID = ? AND personID = ?");
+			PreparedStatement stmtPersonID = conn.prepareStatement("SELECT personID FROM Person WHERE firstname = ? AND lastname = ?");
+			stmt = conn.prepareStatement("UPDATE Person_Project SET personID = ?, projectID = ? WHERE ppID = ?");
+			for(String fullname : nameArray) 
+			{
+				String[] splitName = fullname.split("\\s+");
+				
+				String firstname = splitName[0];
+				String lastname = splitName[1];
+				
+				stmtPersonID.setString(1, firstname);
+				stmtPersonID.setString(2, lastname);
+				
+				ResultSet rsPersonId = stmtPersonID.executeQuery();
+	            if (rsPersonId.next()) 
+	            {
+	                int personID = rsPersonId.getInt("personID");
+	                stmtPpID.setInt(1, personID);
+	                stmtPpID.setInt(2, pID);
+	                ResultSet ppIDRes = stmtPpID.executeQuery();
+	                if(ppIDRes.next()) 
+	                { 
+	                	int ppID = ppIDRes.getInt("ppID");
+	                	stmt.setInt(1, personID);
+	                	stmt.setInt(2, pID);
+	                	stmt.setInt(3, ppID);
+	                	stmt.executeUpdate();
+	                }
+	                else 
+	                {
+	                	stmt.close();
+	                	PreparedStatement insertNew = conn.prepareStatement("INSERT INTO Person_Project (personID, projectID) VALUES (?,?)");
+	                	insertNew.setInt(1, personID);
+	                	insertNew.setInt(1, pID);
+	                	insertNew.execute();
+	                	insertNew.close();
+	                }
+	                stmtPpID.close();
+	                
+	            }
+	            else 
+	            {
+	            	System.out.println("Person does not exist " + fullname);
+	            }
+	            stmtPersonID.close();
+			}
 		} 
 		catch (SQLException e) 
 		{
 			e.printStackTrace();
+		}
+		finally 
+		{
+	        try 
+	        {
+	            if (conn != null) 
+	            {
+	                conn.close();
+	            }
+	        }
+	        catch (SQLException e) 
+	        {
+            e.printStackTrace();
+	        }
 		}
 		
 	}
