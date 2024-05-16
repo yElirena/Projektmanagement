@@ -708,6 +708,7 @@ public class PMWindow extends JFrame {
 				{
 					e1.printStackTrace();
 				}
+				resetFields();
 			}
 		});
 		

@@ -10,7 +10,6 @@ import javax.crypto.spec.PBEKeySpec;
 public class PasswordHash 
 {
 	private static SecureRandom random = new SecureRandom();
-	private static String password;
 	private static String newPassword;
 	
 	
