@@ -692,13 +692,13 @@ public class PMWindow extends JFrame {
 					String description = taDescription.getText();
 					String collabs = taCollabs.getText();
 					
-					if(!tfFirstname.getText().isEmpty() && !tfLastname.getText().isEmpty() && !tfEmail.getText().isEmpty() && !tfPhone.getText().isEmpty() && !tfUsername.getText().isEmpty() && !tfPassword.getText().isEmpty()) 
+					if(arePersonFieldsFilled()) 
 					{
 						
-						PMDatabase.updatePerson(firstname, lastname, username, email, phone, fax, username, password, personID);						
+						PMDatabase.updatePerson(firstname, lastname, gender, email, phone, fax, username, password, personID);						
 						PMDatabase.fetchFromPerson(modelPerson);						
 					}
-					else if(!tfAcronym.getText().isEmpty() && !tfTitle.getText().isEmpty() && !tfStartdate.getText().isEmpty() && !taDescription.getText().isEmpty())
+					else if(areProjectFieldsFilled())
 					{
 						PMDatabase.updateProject(acronym, title, startdate, endDate, description, collabs, projectID);
 						PMDatabase.fetchFromProjects(modelProject);						
@@ -847,6 +847,25 @@ public class PMWindow extends JFrame {
 	public void setUserInput( boolean active) {
 		this.isUserInsert = active;
 		//changeButtonState(active);
+	}
+	
+	public boolean arePersonFieldsFilled() 
+	{
+		return !tfFirstname.getText().isEmpty() && 
+				!tfLastname.getText().isEmpty() && 
+				!tfEmail.getText().isEmpty() && 
+				!tfPhone.getText().isEmpty() && 
+				!tfUsername.getText().isEmpty() && 
+				!tfPassword.getText().isEmpty();
+		
+	}
+	
+	public boolean areProjectFieldsFilled() 
+	{
+		return !tfAcronym.getText().isEmpty() && 
+				!tfTitle.getText().isEmpty() && 
+				!tfStartdate.getText().isEmpty() && 
+				!taDescription.getText().isEmpty();
 	}
 	
 //courtesy of Sven	

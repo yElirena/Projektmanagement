@@ -281,7 +281,7 @@ public class PMDatabase
 		}
 	}
 	
-	public static void updatePerson(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, int pID)
+	public static void updatePerson(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, int personID)
 	{
 		connect();
 		
@@ -296,7 +296,7 @@ public class PMDatabase
 			stmt.setString(6, fax);
 			stmt.setString(7, user);
 			stmt.setString(8, pw);
-			stmt.setInt(9, pID);
+			stmt.setInt(9, personID);
 			stmt.executeUpdate();
 			
 			closeConn();
@@ -306,7 +306,7 @@ public class PMDatabase
 		}
 		
 	}
-	public static void updateProject(String acr, String title, String start, String end, String desc, String collabs, int pID) 
+	public static void updateProject(String acr, String title, String start, String end, String desc, String collabs, int projectID) 
 	{
 		try 
 		{
@@ -316,7 +316,7 @@ public class PMDatabase
 			stmt.setString(3, start);
 			stmt.setString(4, end);
 			stmt.setString(5, desc);
-			stmt.setInt(6, pID);
+			stmt.setInt(6, projectID);
 			stmt.executeUpdate();
 			
 			String[] nameArray = collabs.split("[,\\s]+");
@@ -338,13 +338,13 @@ public class PMDatabase
 	            {
 	                int personID = rsPersonId.getInt("personID");
 	                stmtPpID.setInt(1, personID);
-	                stmtPpID.setInt(2, pID);
+	                stmtPpID.setInt(2, projectID);
 	                ResultSet ppIDRes = stmtPpID.executeQuery();
 	                if(ppIDRes.next()) 
 	                { 
 	                	int ppID = ppIDRes.getInt("ppID");
 	                	stmt.setInt(1, personID);
-	                	stmt.setInt(2, pID);
+	                	stmt.setInt(2, projectID);
 	                	stmt.setInt(3, ppID);
 	                	stmt.executeUpdate();
 	                }
@@ -353,7 +353,7 @@ public class PMDatabase
 	                	stmt.close();
 	                	PreparedStatement insertNew = conn.prepareStatement("INSERT INTO Person_Project (personID, projectID) VALUES (?,?)");
 	                	insertNew.setInt(1, personID);
-	                	insertNew.setInt(1, pID);
+	                	insertNew.setInt(1, projectID);
 	                	insertNew.execute();
 	                	insertNew.close();
 	                }
@@ -387,31 +387,7 @@ public class PMDatabase
 		}
 		
 	}
-	public static void updateAll(String fname, String lname, String sex, String email, String phone, String fax, String user, String pw, int personID, String acr, String title, String start, String end, String desc, String collabs, int pID, int ppID) 
-	{
-		Thread dPerson = new Thread(() -> 
-		{
-			updatePerson(fname, lname, sex, email, phone, fax, user, pw, pID);
-		});
-		Thread dProject = new Thread(() -> 
-		{
-			updateProject(acr, title, start, end, desc, collabs, pID);
-		});
-		
-		dPerson.start();
-		dProject.start();
-		
-		try 
-		{
-			dPerson.join();
-			dProject.join();
-		}
-		catch(InterruptedException e) 
-		{
-			e.printStackTrace();
-			e.getMessage();
-		}
-	}
+
 	
 	/**
      * Closes the database connection.
