@@ -306,7 +306,7 @@ public class PMDatabase
 		}
 		
 	}
-	public static void updateProject(String acr, String title, String start, String end, String desc, String collabs, int projectID) 
+	public static void updateProject(String acr, String title, String start, String end, String desc,  int projectID) 
 	{
 		try 
 		{
@@ -318,54 +318,6 @@ public class PMDatabase
 			stmt.setString(5, desc);
 			stmt.setInt(6, projectID);
 			stmt.executeUpdate();
-			
-			String[] nameArray = collabs.split("[,\\s]+");
-			PreparedStatement stmtPpID = conn.prepareStatement("SELECT ppID FROM Person_Project WHERE projectID = ? AND personID = ?");
-			PreparedStatement stmtPersonID = conn.prepareStatement("SELECT personID FROM Person WHERE firstname = ? AND lastname = ?");
-			stmt = conn.prepareStatement("UPDATE Person_Project SET personID = ?, projectID = ? WHERE ppID = ?");
-			for(String fullname : nameArray) 
-			{
-				String[] splitName = fullname.split("\\s+");
-				
-				String firstname = splitName[0];
-				String lastname = splitName[1];
-				
-				stmtPersonID.setString(1, firstname);
-				stmtPersonID.setString(2, lastname);
-				
-				ResultSet rsPersonId = stmtPersonID.executeQuery();
-	            if (rsPersonId.next()) 
-	            {
-	                int personID = rsPersonId.getInt("personID");
-	                stmtPpID.setInt(1, personID);
-	                stmtPpID.setInt(2, projectID);
-	                ResultSet ppIDRes = stmtPpID.executeQuery();
-	                if(ppIDRes.next()) 
-	                { 
-	                	int ppID = ppIDRes.getInt("ppID");
-	                	stmt.setInt(1, personID);
-	                	stmt.setInt(2, projectID);
-	                	stmt.setInt(3, ppID);
-	                	stmt.executeUpdate();
-	                }
-	                else 
-	                {
-	                	stmt.close();
-	                	PreparedStatement insertNew = conn.prepareStatement("INSERT INTO Person_Project (personID, projectID) VALUES (?,?)");
-	                	insertNew.setInt(1, personID);
-	                	insertNew.setInt(1, projectID);
-	                	insertNew.execute();
-	                	insertNew.close();
-	                }
-	                stmtPpID.close();
-	                
-	            }
-	            else 
-	            {
-	            	System.out.println("Person does not exist " + fullname);
-	            }
-	            stmtPersonID.close();
-			}
 		} 
 		catch (SQLException e) 
 		{
@@ -387,9 +339,65 @@ public class PMDatabase
 		}
 		
 	}
+    public static void updateCollabs(int projectID, String collabs) throws SQLException 
+    {
+    	if(collabs != null) 
+    	{
+    		String[] nameArray = collabs.split("[,\\s]+");
+    		for(int i = 0; i < nameArray.length; i+=2) 
+    		{
+    			if(i+ 1 >= nameArray.length) 
+    			{
+    				JOptionPane.showMessageDialog(null, "Invalid name.");
+    				continue;
+    			}
+    			String firstname = nameArray[i];
+    			String lastname = nameArray[+ +1];
+    			int personID = getPersonID(firstname, lastname);
+    			if(personID != 0 && !doesPPDBEntryExist(personID, projectID)) 
+    			{
+    				insertIntoCollab(projectID, collabs);
+    			}
+    				
+    		}
+    	}
+    }
 
+    public static int getPersonID(String firstname, String lastname) throws SQLException 
+    {
+    	connect();
+    	int personID = 0;
+    	stmt = conn.prepareStatement("SELECT personID FROM Person WHERE firstname = ? AND lastname = ?");
+    	stmt.setString(1, firstname);
+    	stmt.setString(2, lastname);
+    	ResultSet rs = stmt.executeQuery();
+    	if(rs.next()) 
+    	{
+    		personID = rs.getInt("personID");
+    	}
+    	else 
+    	{
+    		JOptionPane.showMessageDialog(null, firstname + lastname + " does not exist");
+    	}
+    	closeConn();
+    	return personID;
+    }
 	
-	/**
+    public static boolean doesPPDBEntryExist(int personID, int projectID) throws SQLException 
+    {
+    	boolean exists = false;
+    	connect();
+    	stmt = conn.prepareStatement("SELECT COUNT(*) FROM Person_Project WHERE personID = ? AND projectID = ?");
+    	stmt.setInt(1, personID);
+    	stmt.setInt(2, projectID);
+    	ResultSet rs = stmt.executeQuery();
+    	if(rs.next()) 
+    	{
+    		exists = rs.getInt(1) > 0;
+    	}
+    	return exists;
+    }
+    /**
      * Closes the database connection.
      */
 	public static void closeConn() 

@@ -663,6 +663,7 @@ public class PMWindow extends JFrame {
 					 btnDelete.setEnabled(true);
 					 btnNew.setEnabled(false);
 					 btnCancel.setEnabled(false);
+					 btnSave.setEnabled(false);
 					 isMouseEventEnabled = true;
 					 isUserInsert = false;
 				 }
@@ -700,7 +701,7 @@ public class PMWindow extends JFrame {
 					}
 					else if(areProjectFieldsFilled())
 					{
-						PMDatabase.updateProject(acronym, title, startdate, endDate, description, collabs, projectID);
+						PMDatabase.updateProject(acronym, title, startdate, endDate, description, projectID);
 						PMDatabase.fetchFromProjects(modelProject);						
 					}
 				} 
@@ -888,6 +889,7 @@ class MyDocumentListener implements DocumentListener {
 				pmWindow.btnDelete.setEnabled(true);
 				pmWindow.btnNew.setEnabled(false);
 				pmWindow.btnCancel.setEnabled(false);
+				pmWindow.btnSave.setEnabled(false);
 				
 				firstRun = false;
 			}
@@ -896,6 +898,7 @@ class MyDocumentListener implements DocumentListener {
 				pmWindow.isUserInsert = true;
 				pmWindow.btnNew.setEnabled(true);
 				pmWindow.btnCancel.setEnabled(true);
+				pmWindow.btnSave.setEnabled(true);
 				pmWindow.btnDelete.setEnabled(false);
 			}
 			
